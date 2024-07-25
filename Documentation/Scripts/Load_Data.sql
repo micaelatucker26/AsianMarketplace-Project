@@ -38,10 +38,10 @@ insert into SubCategory (Name, CategoryName) values ('Chocolates', 'Sweets');
 insert into SubCategory (Name, CategoryName) values ('Candies', 'Sweets');
 
 -- Shopper table data
-insert into Shopper (Username, Password, Salt) values ('MTucker27', 'sq@kmk_12l','fake_salt');
-insert into Shopper (Username, Password, Salt) values ('JHigginbotham26', 'peanuts','another_fake');
-insert into Shopper (Username, Password, Salt) values ('DBishop123', 'mushroomKingdom', 'faker');
-insert into Shopper (Username, Password, Salt) values ('ALord35','dar2thV3ader', 'so-fake');
+insert into Shopper (Username, Password, Salt) values ('MTucker27', 'sq@kmk_12l');
+insert into Shopper (Username, Password, Salt) values ('JHigginbotham26', 'peanuts');
+insert into Shopper (Username, Password, Salt) values ('DBishop123', 'mushroomKingdom');
+insert into Shopper (Username, Password, Salt) values ('ALord35','dar2thV3ader');
 
 -- Order table data
 insert into [Order] (OrderDate, Username) values (GETDATE(), 'MTucker27');

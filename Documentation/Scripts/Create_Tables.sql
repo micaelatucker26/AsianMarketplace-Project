@@ -14,7 +14,9 @@ create table Category (
 create table SubCategory (
 	Name varchar(25) primary key,
 	CategoryName varchar(25) not null
-	constraint Category_FK foreign key (CategoryName) references Category(Name)
+	constraint Category_FK foreign key (CategoryName) 
+	references Category(Name)
+	on delete cascade
 );
 
 
@@ -24,8 +26,7 @@ create table SubCategory (
 -- are combined and that value is hashed and stored in the Password field.
 create table Shopper (
 	Username varchar(25) primary key,
-	Password varchar(255) not null,
-	Salt varchar(255) not null
+	Password varchar(255) not null
 );
 
 
@@ -111,6 +112,7 @@ create table ShoppingListItem (
         REFERENCES ShoppingList (Title, UserID),
     CONSTRAINT ShoppingListItem_Item_FK FOREIGN KEY (ItemID)
         REFERENCES Item (ItemID)
+		ON DELETE CASCADE
 );
 
 
