@@ -22,41 +22,78 @@ namespace AsianMarketplace_WebAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateOrderItem([FromBody] OrderItemDTO orderItemDTO)
         {
-            // Map the DTO to the entity
-            var newOrderItem = _mapper.Map<OrderItem>(orderItemDTO);
+            try
+            {
+                // Map the DTO to the entity
+                var newOrderItem = _mapper.Map<OrderItem>(orderItemDTO);
 
-            // Add the new order item to the context
-            _marketplaceDbContext.OrderItems.Add(newOrderItem);
+                // Add the new order item to the context
+                _marketplaceDbContext.OrderItems.Add(newOrderItem);
 
-            // Save changes to the database
-            await _marketplaceDbContext.SaveChangesAsync();
+                // Save changes to the database
+                await _marketplaceDbContext.SaveChangesAsync();
 
-            return 
-                CreatedAtAction(nameof(GetOrderItems), 
-                new {itemId = newOrderItem.ItemId, orderId = newOrderItem.OrderId}, orderItemDTO);
+                // Return that order item's details (including price, quantity, itemId, and orderId)
+                return
+                    CreatedAtAction(nameof(GetOrderItems),
+                    new { itemId = newOrderItem.ItemId, orderId = newOrderItem.OrderId }, orderItemDTO);
+            }
+            catch (DbUpdateException ex)
+            {
+                // Handle database update exceptions
+                return StatusCode(StatusCodes.Status500InternalServerError, new { Message = "An error occurred while creating an order item.", Details = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                // Handle other exceptions
+                return StatusCode(StatusCodes.Status500InternalServerError, new { Message = "An unexpected error occurred.", Details = ex.Message });
+            }
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<OrderItemDTO>>> GetOrderItems()
         {
-            var orderItems = await _marketplaceDbContext.OrderItems
+            try
+            {
+                // Gather order items into a list
+                var orderItems = await _marketplaceDbContext.OrderItems
                 .ToListAsync();
-            var orderItemDTOs = _mapper.Map<List<OrderItemDTO>>(orderItems);
-            return Ok(orderItemDTOs);
+                if(orderItems == null)
+                {
+                    return NotFound();
+                }
+                // Map the list of order items to the DTO
+                var orderItemDTOs = _mapper.Map<List<OrderItemDTO>>(orderItems);
+                return Ok(orderItemDTOs);
+            }
+            catch (Exception ex)
+            {
+                // Handle other exceptions
+                return StatusCode(StatusCodes.Status500InternalServerError, new { Message = "An unexpected error occurred.", Details = ex.Message });
+            }
         }
 
         [HttpGet("{itemId}/{orderId}")]
         public async Task<ActionResult<OrderItemDTO>> GetOrderItem( Guid itemId, Guid orderId)
         {
+            // Fetch the existing order item from the database
             var orderItem = await _marketplaceDbContext.OrderItems
                 .FirstOrDefaultAsync(oi => oi.ItemId == itemId && oi.OrderId == orderId);
             if (orderItem == null)
             {
                 return NotFound();
             }
-
-            var orderItemDTO = _mapper.Map<OrderItemDTO>(orderItem);
-            return Ok(orderItemDTO);
+            try
+            {
+                // Map that order item to the DTO
+                var orderItemDTO = _mapper.Map<OrderItemDTO>(orderItem);
+                return Ok(orderItemDTO);
+            }
+            catch (Exception ex)
+            {
+                // Handle other exceptions
+                return StatusCode(StatusCodes.Status500InternalServerError, new { Message = "An unexpected error occurred.", Details = ex.Message });
+            }
         }
 
         [HttpPut("{itemId}/{orderId}")]
@@ -69,16 +106,25 @@ namespace AsianMarketplace_WebAPI.Controllers
                 return NotFound();
             }
 
-            orderItem.Price = orderItemDTO.Price;
-            orderItem.Quantity = orderItemDTO.Quantity;
-            orderItem.ItemId = itemId;
-            orderItem.OrderId = orderId;
+            try
+            {
+                // The price and the quantity will be updated
+                orderItem.Price = orderItemDTO.Price;
+                orderItem.Quantity = orderItemDTO.Quantity;
+                orderItemDTO.ItemId = itemId;
+                orderItemDTO.OrderId = orderId;
 
-            // Save changes to the database
-            await _marketplaceDbContext.SaveChangesAsync(); 
-           
-            // return a response
-            return NoContent();
+                // Save changes to the database
+                await _marketplaceDbContext.SaveChangesAsync();
+
+                // Return a response
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                // Handle other exceptions
+                return StatusCode(StatusCodes.Status500InternalServerError, new { Message = "An unexpected error occurred.", Details = ex.Message });
+            }
         }
 
         [HttpDelete("{itemId}/{orderId}")]
@@ -90,11 +136,21 @@ namespace AsianMarketplace_WebAPI.Controllers
             {
                 return NotFound();
             }
-            _marketplaceDbContext.OrderItems.Remove(orderItem);
+            try
+            {
+                // Remove that order item from the database
+                _marketplaceDbContext.OrderItems.Remove(orderItem);
 
-            await _marketplaceDbContext.SaveChangesAsync();
+                // Save changes to the database
+                await _marketplaceDbContext.SaveChangesAsync();
 
-            return NoContent();
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                // Handle other exceptions
+                return StatusCode(StatusCodes.Status500InternalServerError, new { Message = "An unexpected error occurred.", Details = ex.Message });
+            }
         }
     }
 }

@@ -11,8 +11,8 @@ namespace AsianMarketplace_WebAPI.Models
         }
 
         public string Title { get; set; } = null!;
-        public string? IsActive { get; set; }
-        public DateTime? DateCreated { get; set; }
+        public char IsActive { get; set; }
+        public DateTime DateCreated { get; set; }
         public string UserId { get; set; } = null!;
 
         // These fields are virtual to allow EF Core to override

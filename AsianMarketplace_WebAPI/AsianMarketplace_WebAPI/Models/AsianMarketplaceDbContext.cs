@@ -16,10 +16,10 @@ namespace AsianMarketplace_WebAPI.Models
         {
         }
 
-        public virtual DbSet<CartItem> CartItems { get; set; } = null!;
+        public virtual DbSet<CartItem> CartItems { get; set; }
         public virtual DbSet<CartView> CartViews { get; set; } = null!;
         public virtual DbSet<Category> Categories { get; set; } = null!;
-        public virtual DbSet<Item> Items { get; set; } = null!;
+        public virtual DbSet<Item> Items { get; set; }
         public virtual DbSet<Order> Orders { get; set; } = null!;
         public virtual DbSet<OrderItem> OrderItems { get; set; } = null!;
         public virtual DbSet<Shopper> Shoppers { get; set; } = null!;
@@ -131,7 +131,7 @@ namespace AsianMarketplace_WebAPI.Models
                     .HasMaxLength(25)
                     .IsUnicode(false);
 
-                entity.HasOne(d => d.SubCategoryNameNavigation)
+                entity.HasOne(d => d.SubCategory)
                     .WithMany(p => p.Items)
                     .HasForeignKey(d => d.SubCategoryName)
                     .OnDelete(DeleteBehavior.ClientSetNull)
@@ -152,7 +152,7 @@ namespace AsianMarketplace_WebAPI.Models
                     .HasMaxLength(25)
                     .IsUnicode(false);
 
-                entity.HasOne(d => d.UsernameNavigation)
+                entity.HasOne(d => d.Shopper)
                     .WithMany(p => p.Orders)
                     .HasForeignKey(d => d.Username)
                     .OnDelete(DeleteBehavior.ClientSetNull)
@@ -197,10 +197,6 @@ namespace AsianMarketplace_WebAPI.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.Password)
-                    .HasMaxLength(255)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.Salt)
                     .HasMaxLength(255)
                     .IsUnicode(false);
             });

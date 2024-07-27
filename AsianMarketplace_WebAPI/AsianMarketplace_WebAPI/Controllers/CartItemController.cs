@@ -22,41 +22,77 @@ namespace AsianMarketplace_WebAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateCartItem([FromBody] CartItemDTO cartItemDTO)
         {
-            // Map the DTO to the entity
-            var newCartItem = _mapper.Map<CartItem>(cartItemDTO);
+            try
+            {
+                // Map the DTO to the entity
+                var newCartItem = _mapper.Map<CartItem>(cartItemDTO);
 
-            // Add the new cart item to the context
-            _marketplaceDbContext.CartItems.Add(newCartItem);
+                // Add the new cart item to the context
+                _marketplaceDbContext.CartItems.Add(newCartItem);
 
-            // Save changes to the database
-            await _marketplaceDbContext.SaveChangesAsync();
+                // Save changes to the database
+                await _marketplaceDbContext.SaveChangesAsync();
 
-            return 
-                CreatedAtAction(nameof(GetCartItem), 
-                new {itemId = newCartItem.ItemId, userId = newCartItem.UserId}, cartItemDTO);
+                // Return that cart item's details (including quantity, itemId, and userId)
+                return
+                    CreatedAtAction(nameof(GetCartItem),
+                    new { itemId = newCartItem.ItemId, userId = newCartItem.UserId }, cartItemDTO);
+            }
+            catch(DbUpdateException ex)
+            {
+                // Handle database update exceptions
+                return StatusCode(StatusCodes.Status500InternalServerError, new { Message = "An error occurred while creating a cart item.", Details = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                // Handle other exceptions
+                return StatusCode(StatusCodes.Status500InternalServerError, new { Message = "An unexpected error occurred.", Details = ex.Message });
+            }
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<CartItemDTO>>> GetCartItems()
         {
-            var cartItems = await _marketplaceDbContext.CartItems
-                .ToListAsync();
-            var cartItemDTOs = _mapper.Map<List<CartItemDTO>>(cartItems);
-            return Ok(cartItemDTOs);
+            try
+            {
+                // Gather cart items into a list
+                var cartItems = await _marketplaceDbContext.CartItems.ToListAsync();
+                if(cartItems == null)
+                {
+                    return NotFound();
+                }
+                // Map the list of cart items to the DTO
+                var cartItemDTOs = _mapper.Map<List<CartItemDTO>>(cartItems);
+                return Ok(cartItemDTOs);
+            }
+            catch(Exception ex)
+            {
+                // Handle other exceptions
+                return StatusCode(StatusCodes.Status500InternalServerError, new { Message = "An unexpected error occurred.", Details = ex.Message });
+            }
         }
 
         [HttpGet("{itemId}/{userId}")]
         public async Task<ActionResult<CartItemDTO>> GetCartItem(Guid itemId, string userId)
         {
+            // Fetch the existing cart item from the database
             var cartItem = await _marketplaceDbContext.CartItems.FindAsync(itemId, userId);
 
             if (cartItem == null)
             {
                 return NotFound();
             }
-
-            var cartItemDTO = _mapper.Map<CartItemDTO>(cartItem);
-            return Ok(cartItemDTO);
+            try
+            {
+                // Map that cart item to the DTO
+                var cartItemDTO = _mapper.Map<CartItemDTO>(cartItem);
+                return Ok(cartItemDTO);
+            }
+            catch (Exception ex)
+            {
+                // Handle other exceptions
+                return StatusCode(StatusCodes.Status500InternalServerError, new { Message = "An unexpected error occurred.", Details = ex.Message });
+            }
         }
 
         [HttpPut("{itemId}/{userId}")]
@@ -69,15 +105,24 @@ namespace AsianMarketplace_WebAPI.Controllers
                 return NotFound();
             }
 
-            cartItem.Quantity = cartItemDTO.Quantity;
-            cartItem.ItemId = itemId;
-            cartItem.UserId = userId;
+            try
+            {
+                // The quantity will be updated
+                cartItem.Quantity = cartItemDTO.Quantity;
+                cartItemDTO.ItemId = itemId;
+                cartItemDTO.UserId = userId;
 
-            // Save changes to the database
-            await _marketplaceDbContext.SaveChangesAsync(); 
-           
-            // return a response
-            return NoContent();
+                // Save changes to the database
+                await _marketplaceDbContext.SaveChangesAsync();
+
+                // Return a response
+                return NoContent();
+            }
+            catch(Exception ex)
+            {
+                // Handle other exceptions
+                return StatusCode(StatusCodes.Status500InternalServerError, new { Message = "An unexpected error occurred.", Details = ex.Message });
+            }
         }
 
         [HttpDelete("{itemId}/{userId}")]
@@ -89,11 +134,21 @@ namespace AsianMarketplace_WebAPI.Controllers
             {
                 return NotFound();
             }
-            _marketplaceDbContext.CartItems.Remove(cartItem);
+            try
+            {
+                // Remove that cart item from the database
+                _marketplaceDbContext.CartItems.Remove(cartItem);
 
-            await _marketplaceDbContext.SaveChangesAsync();
+                // Save changes to the database
+                await _marketplaceDbContext.SaveChangesAsync();
 
-            return NoContent();
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                // Handle other exceptions
+                return StatusCode(StatusCodes.Status500InternalServerError, new { Message = "An unexpected error occurred.", Details = ex.Message });
+            }
         }
     }
 }
