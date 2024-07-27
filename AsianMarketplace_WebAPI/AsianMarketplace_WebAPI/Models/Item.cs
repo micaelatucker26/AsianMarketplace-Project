@@ -24,7 +24,7 @@ namespace AsianMarketplace_WebAPI.Models
         // these properties in derived classes and to allow lazy loading
         // that delays loading their values from the db until accessed the
         // first time
-        public virtual SubCategory SubCategoryNameNavigation { get; set; } = null!;
+        public virtual SubCategory SubCategory { get; set; } = null!;
         public virtual ICollection<CartItem> CartItems { get; set; }
         public virtual ICollection<OrderItem> OrderItems { get; set; }
         public virtual ICollection<ShoppingListItem> ShoppingListItems { get; set; }

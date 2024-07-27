@@ -18,7 +18,7 @@ namespace AsianMarketplace_WebAPI.Models
         // these properties in derived classes and to allow lazy loading
         // that delays loading their values from the db until accessed the
         // first time
-        public virtual Shopper UsernameNavigation { get; set; } = null!;
+        public virtual Shopper Shopper { get; set; } = null!;
         public virtual ICollection<OrderItem> OrderItems { get; set; }
     }
 }

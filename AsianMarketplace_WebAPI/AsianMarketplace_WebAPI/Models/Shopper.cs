@@ -14,7 +14,6 @@ namespace AsianMarketplace_WebAPI.Models
 
         public string Username { get; set; } = null!;
         public string Password { get; set; } = null!;
-        public string Salt { get; set; } = null!;
 
         // These fields are virtual to allow EF Core to override
         // these properties in derived classes and to allow lazy loading

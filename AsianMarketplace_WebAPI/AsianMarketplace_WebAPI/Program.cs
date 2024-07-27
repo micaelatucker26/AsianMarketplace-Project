@@ -1,7 +1,25 @@
+using AsianMarketplace_WebAPI.DTOs;
 using AsianMarketplace_WebAPI.Models;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Register AutoMapper
+var config = new MapperConfiguration(cfg => 
+    { 
+        cfg.CreateMap<CartItem, CartItemDTO>().ReverseMap(); 
+        cfg.CreateMap<Category, CategoryDTO>().ReverseMap();
+        cfg.CreateMap<Item, ItemDTO>().ReverseMap();
+        cfg.CreateMap<Order, OrderDTO>().ReverseMap();
+        cfg.CreateMap<OrderItem, OrderItemDTO>().ReverseMap();
+        cfg.CreateMap<Shopper, ShopperDTO>().ReverseMap();
+        cfg.CreateMap<ShoppingList, ShoppingListDTO>().ReverseMap();
+        cfg.CreateMap<ShoppingListItem, ShoppingListItemDTO>().ReverseMap();
+        cfg.CreateMap<SubCategory, SubCategoryDTO>().ReverseMap();
+    });
+var mapper = config.CreateMapper();
+builder.Services.AddSingleton(mapper);
 
 // Add services to the container.
 builder.Services.AddDbContext<AsianMarketplaceDbContext>(options =>
