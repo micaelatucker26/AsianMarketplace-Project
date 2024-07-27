@@ -88,8 +88,8 @@ create table OrderItem (
 -- recent shopping list.
 create table ShoppingList ( 
 	 Title varchar(50) not null,
-	 IsActive char(1),
-	 DateCreated datetime,
+	 IsActive char(1) not null default 'N',
+	 DateCreated datetime not null,
 	 UserID varchar(25) not null,
 	 Primary Key (Title, UserID),
 	 constraint ShoppingList_UserID_FK foreign key (UserID) references Shopper(Username)
@@ -102,8 +102,8 @@ create table ShoppingList (
 -- an item from the shopping list; when the item is crossed off, it moves to another list of completed
 -- items under the current shopping list.
 create table ShoppingListItem (
-	IsCrossedOff char(1) DEFAULT 'N',
-	Quantity int not null CHECK (Quantity >= 1),
+	IsCrossedOff char(1) default 'N',
+	Quantity int not null check (Quantity >= 1),
 	Title varchar(50) not null,
 	UserID varchar(25) not null,
 	ItemID uniqueidentifier not null,
