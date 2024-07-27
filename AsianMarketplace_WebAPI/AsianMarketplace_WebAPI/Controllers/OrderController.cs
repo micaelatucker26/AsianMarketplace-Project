@@ -22,34 +22,63 @@ namespace AsianMarketplace_WebAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateOrder([FromBody] OrderDTO orderDTO)
         {
-            // Map the DTO to the entity
-            var newOrder = _mapper.Map<Order>(orderDTO);
+            try
+            {
+                // Map the DTO to the entity
+                var newOrder = _mapper.Map<Order>(orderDTO);
 
-            // Add the new cart item to the context
-            _marketplaceDbContext.Orders.Add(newOrder);
+                // Add the new order to the context
+                _marketplaceDbContext.Orders.Add(newOrder);
 
-            // Save changes to the database
-            await _marketplaceDbContext.SaveChangesAsync();
+                // Save changes to the database
+                await _marketplaceDbContext.SaveChangesAsync();
 
-            return 
-                CreatedAtAction(nameof(GetOrder), 
-                new {orderId = newOrder.OrderId}, orderDTO);
+                // Return that order's details (including orderId, orderdate, and username)
+                return
+                    CreatedAtAction(nameof(GetOrder),
+                    new { orderId = newOrder.OrderId }, orderDTO);
+            }
+            catch (DbUpdateException ex)
+            {
+                // Handle database update exceptions
+                return StatusCode(StatusCodes.Status500InternalServerError, new { Message = "An error occurred while creating an order.", Details = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                // Handle other exceptions
+                return StatusCode(StatusCodes.Status500InternalServerError, new { Message = "An unexpected error occurred.", Details = ex.Message });
+            }
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<OrderDTO>>> GetOrders()
         {
-            var orders = await _marketplaceDbContext.Orders
+            try
+            {
+                // Gather orders into a list
+                var orders = await _marketplaceDbContext.Orders
                 .Include(o => o.Shopper)
                 .Include(o => o.OrderItems)
                 .ToListAsync();
-            var orderDTOs = _mapper.Map<List<OrderDTO>>(orders);
-            return Ok(orderDTOs);
+                if(orders == null)
+                {
+                    return NotFound();
+                }
+                // Map the list of orders to the DTO
+                var orderDTOs = _mapper.Map<List<OrderDTO>>(orders);
+                return Ok(orderDTOs);
+            }
+            catch (Exception ex)
+            {
+                // Handle other exceptions
+                return StatusCode(StatusCodes.Status500InternalServerError, new { Message = "An unexpected error occurred.", Details = ex.Message });
+            }
         }
 
         [HttpGet("{orderId}")]
         public async Task<ActionResult<OrderDTO>> GetOrder(Guid orderId)
         {
+            // Fetch the existing order from the database
             var order = await _marketplaceDbContext.Orders
                 .Include(o => o.OrderItems)
                 .FirstOrDefaultAsync(o => o.OrderId == orderId);
@@ -57,9 +86,17 @@ namespace AsianMarketplace_WebAPI.Controllers
             {
                 return NotFound();
             }
-
-            var orderDTO = _mapper.Map<OrderDTO>(order);
-            return Ok(orderDTO);
+            try
+            {
+                // Map that order to the DTO
+                var orderDTO = _mapper.Map<OrderDTO>(order);
+                return Ok(orderDTO);
+            }
+            catch (Exception ex)
+            {
+                // Handle other exceptions
+                return StatusCode(StatusCodes.Status500InternalServerError, new { Message = "An unexpected error occurred.", Details = ex.Message });
+            }
         }
 
         [HttpPut("{orderId}")]
@@ -72,15 +109,24 @@ namespace AsianMarketplace_WebAPI.Controllers
                 return NotFound();
             }
 
-            order.OrderId = orderId;
-            order.OrderDate = orderDTO.OrderDate;
-            order.Username = orderDTO.Username;
+            try
+            {
+                orderDTO.OrderId = orderId;
+                // The order date and username will be updated
+                order.OrderDate = orderDTO.OrderDate;
+                order.Username = orderDTO.Username;
 
-            // Save changes to the database
-            await _marketplaceDbContext.SaveChangesAsync(); 
-           
-            // return a response
-            return NoContent();
+                // Save changes to the database
+                await _marketplaceDbContext.SaveChangesAsync();
+
+                // Return a response
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                // Handle other exceptions
+                return StatusCode(StatusCodes.Status500InternalServerError, new { Message = "An unexpected error occurred.", Details = ex.Message });
+            }
         }
 
         [HttpDelete("{orderId}")]
@@ -92,11 +138,21 @@ namespace AsianMarketplace_WebAPI.Controllers
             {
                 return NotFound();
             }
-            _marketplaceDbContext.Orders.Remove(order);
+            try
+            {
+                // Remove that order from the database
+                _marketplaceDbContext.Orders.Remove(order);
 
-            await _marketplaceDbContext.SaveChangesAsync();
+                // Save changes to the database
+                await _marketplaceDbContext.SaveChangesAsync();
 
-            return NoContent();
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                // Handle other exceptions
+                return StatusCode(StatusCodes.Status500InternalServerError, new { Message = "An unexpected error occurred.", Details = ex.Message });
+            }
         }
     }
 }
