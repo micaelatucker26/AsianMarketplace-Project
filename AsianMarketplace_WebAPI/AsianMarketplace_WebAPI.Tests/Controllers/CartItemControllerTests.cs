@@ -31,7 +31,6 @@ namespace AsianMarketplace_WebAPI.Tests.Controllers
             _controller = new CartItemController(_mockDbContext.Object, _mockMapper.Object);
         }
 
-
         [Fact]
         public async Task CreateCartItem_ShouldReturnCreatedAtAction()
         {
