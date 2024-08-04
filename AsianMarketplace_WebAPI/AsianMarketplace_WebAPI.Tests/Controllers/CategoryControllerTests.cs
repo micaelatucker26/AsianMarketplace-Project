@@ -13,178 +13,165 @@ using System.Threading.Tasks;
 using Xunit;
 using FluentAssertions;
 using Moq;
+using AsianMarketplace_WebAPI.Tests.Test_Fixures;
 
 namespace AsianMarketplace_WebAPI.Tests.Controllers
 {
-    public class CategoryControllerTests
+    public class CategoryControllerTests: IClassFixture<CategoryControllerTestsFixture>
     {
-        //private readonly AsianMarketplaceDbContext _context;
-        //private readonly Mock<IMapper> _mockMapper;
-        //private readonly CategoryController _controller;
+        private readonly AsianMarketplaceDbContext _context;
+        private readonly Mock<IMapper> _mockMapper;
+        private readonly CategoryController _controller;
 
-        //public CategoryControllerTests()
-        //{
-        //    var options = new DbContextOptionsBuilder<AsianMarketplaceDbContext>
-        //        ().UseInMemoryDatabase(databaseName: "TestDatabase")
-        //        .Options;
-        //    _context = new AsianMarketplaceDbContext(options);
+        public CategoryControllerTests(CategoryControllerTestsFixture fixture)
+        {
+            _context = fixture.Context;
+            // Mock the AutoMapper mapper to use when mapping my entities to DTOs
+            _mockMapper = fixture.MockMapper;
+            // Using my controller, have it use the mocked context and mocked mapper
+            _controller = new CategoryController(_context, _mockMapper.Object);
+        }
 
-        //    // Seed the database with test data
-        //    _context.CartItems.AddRange(new List<CartItem>
-        //    {
-        //       new CartItem { ItemId = Guid.NewGuid(), Quantity = 2, UserId = "user1"},
-        //       new CartItem { ItemId = Guid.NewGuid(), Quantity = 3, UserId = "user2"},
-        //       new CartItem { ItemId = Guid.NewGuid(), Quantity = 1, UserId = "user3" }
-        //    });
-        //    _context.SaveChanges();
+        [Fact]
+        public async Task CreateCategory_ShouldReturnCreatedAtAction()
+        {
+            // Creates a category DTO and a category as input
+            var categoryDTO = new CategoryDTO { Name = "Test1" };
+            var category = new Category { Name = categoryDTO.Name };
 
-        //    _mockMapper = new Mock<IMapper>();
-        //    _mockMapper.Setup(m => m.Map<List<CartItemDTO>>(It.IsAny<List<CartItem>>()))
-        //        .Returns((List<CartItem> source) =>
-        //        {
-        //            return source.Select(item => new CartItemDTO 
-        //            { ItemId = item.ItemId, Quantity = item.Quantity, UserId = item.UserId }).ToList();
-        //        });
+            // Sets up the mock to return the category when Map is called with any CategoryDTO
+            _mockMapper.Setup(m => m.Map<Category>(It.IsAny<CategoryDTO>())).Returns(category);
 
-        //    _controller = new CartItemController(_context, _mockMapper.Object);
-        //}
+            // Store the result after calling CreateCategory
+            var result = await _controller.CreateCategory(categoryDTO);
 
-        //[Fact]
-        //public async Task CreateCartItem_ShouldReturnCreatedAtAction()
-        //{
-        //    // Creates a cart item DTO and a cart item as input
-        //    var cartItemDTO = new CartItemDTO { Quantity = 3, ItemId = Guid.NewGuid(), UserId = "User1" };
-            
-        //    var cartItem = new CartItem { Quantity = cartItemDTO.Quantity, ItemId = cartItemDTO.ItemId, UserId = cartItemDTO.UserId };
+            // Store the action result
+            var createdAtResult = result as CreatedAtActionResult;
+            // Check if the result is not null
+            createdAtResult.Should().NotBeNull();
+            // Check for a 201 response
+            createdAtResult.StatusCode.Should().Be(201);
 
-        //    // Sets up the mock to return the cartItem when Map is called with any CartItemDTO
-        //    _mockMapper.Setup(m => m.Map<CartItem>(It.IsAny<CartItemDTO>())).Returns(cartItem);
+            // Store the value of the created category
+            var createdCategory = createdAtResult.Value as CategoryDTO;
+            // Check if the result is not null
+            createdCategory.Should().NotBeNull();
+            // Check if each of the fields match the DTO field values
+            createdCategory.Name.Should().Be(categoryDTO.Name);
 
-        //    // Store the result
-        //    var result = await _controller.CreateCartItem(cartItemDTO);
-
-        //    var createdAtResult = result as CreatedAtActionResult;
-        //    createdAtResult.Should().NotBeNull();
-        //    createdAtResult.StatusCode.Should().Be(201);
-
-        //    var createdCartItem = createdAtResult.Value as CartItemDTO;
-        //    createdCartItem.Should().NotBeNull();
-        //    createdCartItem.Quantity.Should().Be(cartItemDTO.Quantity);
-        //    createdCartItem.ItemId.Should().Be(cartItemDTO.ItemId);
-        //    createdCartItem.UserId.Should().Be(cartItemDTO.UserId);
-
-        //    // Verify the cart item was added to the context
-        //    var dbCartItem = await _context.CartItems.FindAsync(cartItem.ItemId, cartItem.UserId);
-        //    dbCartItem.Should().NotBeNull();
-        //    dbCartItem.Quantity.Should().Be(cartItemDTO.Quantity);
-        //    dbCartItem.ItemId.Should().Be(cartItemDTO.ItemId);
-        //    dbCartItem.UserId.Should().Be(cartItemDTO.UserId);
-        //}
+            // Verify the category was added to the context
+            var dbCategory = await _context.Categories.FindAsync(category.Name);
+            dbCategory.Should().NotBeNull();
+            dbCategory.Name.Should().Be(categoryDTO.Name);
+        }
 
 
-        //[Fact]
-        //public async Task GetCartItems_ShouldReturnAllCartItems()
-        //{
-        //    var result = await _controller.GetCartItems();
+        [Fact]
+        public async Task GetCategories_ShouldReturnAllCategories()
+        {
+            // Store the result after calling GetCategories
+            var result = await _controller.GetCategories();
 
-        //    var okResult = result.Result as OkObjectResult;
+            // Store the action result
+            var okResult = result.Result as OkObjectResult;
+            // Check if the result is not null
+            okResult.Should().NotBeNull();
+            // Check for a 200 response
+            okResult.StatusCode.Should().Be(200);
 
-        //    okResult.Should().NotBeNull();
-        //    okResult.StatusCode.Should().Be(200);
-
-        //    var cartItems = okResult.Value as List<CartItemDTO>;
-        //    cartItems.Should().NotBeNull();
-        //    //cartItems.Count.Should().Be(3);
-        //    cartItems[0].UserId.Should().Be("user1");
-        //    cartItems[1].UserId.Should().Be("user2");
-        //    cartItems[2].UserId.Should().Be("user3");
-        //}
-
-
-        //[Fact]
-        //public async Task GetCartItem_ShouldReturnACartItem()
-        //{
-        //    var result = await _controller.GetCartItems();
-        //    var okResult = result.Result as OkObjectResult;
-        //    var cartItems = okResult.Value as List<CartItemDTO>;
-
-        //    var itemId = cartItems.FirstOrDefault().ItemId;
-        //    var userId = cartItems.FirstOrDefault().UserId;
-        //    var quantity = cartItems.FirstOrDefault().Quantity;
-
-        //    // Create a cart item given the two pieces of information above and other details
-        //    var cartItem = new CartItem { ItemId = itemId, UserId = userId, Quantity = quantity };
-
-        //    // Create a CartDTO with the same information
-        //    var cartItemDTO = new CartItemDTO { ItemId = itemId, UserId = userId, Quantity = quantity };
-
-        //    // Setup the mock to map that cartItem to the CartItemDTO and return the cartItemDTO
-        //    _mockMapper.Setup(m => m.Map<CartItemDTO>(cartItem)).Returns(cartItemDTO);
-
-        //    // Store the result
-        //    var resultingCartItem = await _controller.GetCartItem(cartItemDTO.ItemId, cartItemDTO.UserId);
-
-        //    var cartItemFound = resultingCartItem.Result as OkObjectResult;
-        //    cartItemFound.Should().NotBeNull();
-        //    cartItemFound.StatusCode.Should().Be(200);
-
-        //    // Verify the cart item is in the database
-        //    var dbCartItem = await _context.CartItems.FindAsync(cartItem.ItemId, cartItem.UserId);
-        //    dbCartItem.Should().NotBeNull();
-        //    dbCartItem.Quantity.Should().Be(cartItemDTO.Quantity);
-        //    dbCartItem.ItemId.Should().Be(cartItemDTO.ItemId);
-        //    dbCartItem.UserId.Should().Be(cartItemDTO.UserId);
-        //}
+            // Store the value of the list of categories
+            var categories = okResult.Value as List<CategoryDTO>;
+            // Check if the result is not null
+            categories.Should().NotBeNull();
+            // Check if the first three categories have the correct names
+            categories[0].Name.Should().Be("testCategory1");
+            categories[1].Name.Should().Be("testCategory2");
+            categories[2].Name.Should().Be("testCategory3");
+        }
 
 
-        //[Fact]
-        //public async Task UpdateCartItem_ReturnNoContent()
-        //{
-        //    var result = await _controller.GetCartItems();
-        //    var okResult = result.Result as OkObjectResult;
-        //    var cartItems = okResult.Value as List<CartItemDTO>;
+        [Fact]
+        public async Task GetCategory_ShouldReturnACategory()
+        {
+            var result = await GetFirstRecord();
+            // Create a category given the information above
+            var category = new Category { Name = result.Name };
 
-        //    var itemId = cartItems.FirstOrDefault().ItemId;
-        //    var userId = cartItems.FirstOrDefault().UserId;
-        //    var quantity = cartItems.FirstOrDefault().Quantity;
+            // Create a CategoryDTO with the same information
+            var categoryDTO = new CategoryDTO { Name = result.Name };
 
-        //    var cartItemDTO = new CartItemDTO { Quantity = 3, ItemId = itemId, UserId = userId };
+            // Setup the mock to map that category to the CategoryDTO and return the categoryDTO
+            _mockMapper.Setup(m => m.Map<CategoryDTO>(category)).Returns(categoryDTO);
 
-        //    var updatedCartItem = _controller.UpdateCartItem(itemId, userId, cartItemDTO);
+            // Store the result after calling GetCategory
+            var resultingCategory = await _controller.GetCategory(categoryDTO.Name);
 
-        //    var cartItemUpdated = updatedCartItem.Result as NoContentResult;
-        //    cartItemUpdated.Should().NotBeNull();
-        //    cartItemUpdated.StatusCode.Should().Be(204);
+            // Store the action result and check if the category is null
+            var categoryFound = resultingCategory.Result as OkObjectResult;
+            categoryFound.Should().NotBeNull();
+            // Check for a 200 response
+            categoryFound.StatusCode.Should().Be(200);
 
-        //    // Verify the cart item is in the database
-        //    var dbCartItem = await _context.CartItems.FindAsync(itemId, userId);
-        //    dbCartItem.Should().NotBeNull();
-        //    dbCartItem.Quantity.Should().Be(cartItemDTO.Quantity);
-        //    dbCartItem.ItemId.Should().Be(cartItemDTO.ItemId);
-        //    dbCartItem.UserId.Should().Be(cartItemDTO.UserId);
-        //}
+            // Verify the cart item is in the database
+            var dbCategory = await _context.Categories.FindAsync(category.Name);
+            dbCategory.Should().NotBeNull();
+            dbCategory.Name.Should().Be(categoryDTO.Name);
+        }
 
 
-        //    [Fact]
-        //    public async Task DeleteCartItem_ReturnNoContent()
-        //    {
-        //    var result = await _controller.GetCartItems();
-        //    var okResult = result.Result as OkObjectResult;
-        //    var cartItems = okResult.Value as List<CartItemDTO>;
+        [Fact]
+        public async Task UpdateCategory_ReturnNoContent()
+        {
+            var result = await GetFirstRecord();
 
-        //    var itemId = cartItems.FirstOrDefault().ItemId;
-        //    var userId = cartItems.FirstOrDefault().UserId;
-        //    var quantity = cartItems.FirstOrDefault().Quantity;
+            // Create a CategoryDTO with the information above
+            var categoryDTO = new CategoryDTO { Name = result.Name };
 
-        //    var deletedCartItem = _controller.DeleteCartItem(itemId, userId);
+            var updatedCategory = _controller.UpdateCategory(result.Name, categoryDTO);
 
-        //    var cartItemUpdated = deletedCartItem.Result as NoContentResult;
-        //    cartItemUpdated.Should().NotBeNull();
-        //    cartItemUpdated.StatusCode.Should().Be(204);
+            var categoryUpdated = updatedCategory.Result as NoContentResult;
+            categoryUpdated.Should().NotBeNull();
+            categoryUpdated.StatusCode.Should().Be(204);
 
-        //    // Verify the cart item is not in the database
-        //    var dbCartItem = await _context.CartItems.FindAsync(itemId, userId);
-        //    dbCartItem.Should().BeNull();
-        //}
+            // Verify the category is in the database
+            var dbCategory = await _context.Categories.FindAsync(result.Name);
+            dbCategory.Should().NotBeNull();
+            dbCategory.Name.Should().Be(categoryDTO.Name);
+        }
+
+
+        [Fact]
+        public async Task DeleteCategory_ReturnNoContent()
+        {
+            var result = await GetFirstRecord();
+
+            var deletedCategory = _controller.DeleteCategory(result.Name);
+
+            var categoryDeleted = deletedCategory.Result as NoContentResult;
+            categoryDeleted.Should().NotBeNull();
+            categoryDeleted.StatusCode.Should().Be(204);
+
+            // Verify the category is not in the database
+            var dbCategory = await _context.Categories.FindAsync(result.Name);
+            dbCategory.Should().BeNull();
+        }
+
+        public async Task<Category> GetFirstRecord()
+        {
+            // Store the result after calling GetCategories
+            var result = await _controller.GetCategories();
+
+            // Store the action result
+            var okResult = result.Result as OkObjectResult;
+            // Store the list of categories that you will pull a category from
+            var categories = okResult.Value as List<CategoryDTO>;
+
+            // Store the first category information
+            var name = categories.FirstOrDefault().Name;
+
+            // Store the first record and return it, to test
+            var firstRecord = new Category { Name = name };
+            return firstRecord;
+        }
     }
 }
