@@ -123,7 +123,7 @@ namespace AsianMarketplace_WebAPI.Tests.Controllers
         public async Task GetCartItem_ShouldReturnACartItem()
         {
             var result = await GetFirstRecord();
-            // Create a cart item given the three pieces of information above
+            // Create a cart item given the information above
             var cartItem = new CartItem { ItemId = result.ItemId, UserId = result.UserId, Quantity = result.Quantity };
 
             // Create a CartDTO with the same information
@@ -155,7 +155,7 @@ namespace AsianMarketplace_WebAPI.Tests.Controllers
         {
             var result = await GetFirstRecord();
 
-            // Create a CartDTO with the same information
+            // Create a CartDTO with the information above
             var cartItemDTO = new CartItemDTO { ItemId = result.ItemId, UserId = result.UserId, Quantity = result.Quantity };
 
             var updatedCartItem = _controller.UpdateCartItem(result.ItemId, result.UserId, cartItemDTO);
@@ -180,9 +180,9 @@ namespace AsianMarketplace_WebAPI.Tests.Controllers
 
             var deletedCartItem = _controller.DeleteCartItem(result.ItemId, result.UserId);
 
-            var cartItemUpdated = deletedCartItem.Result as NoContentResult;
-            cartItemUpdated.Should().NotBeNull();
-            cartItemUpdated.StatusCode.Should().Be(204);
+            var cartItemDeleted = deletedCartItem.Result as NoContentResult;
+            cartItemDeleted.Should().NotBeNull();
+            cartItemDeleted.StatusCode.Should().Be(204);
 
             // Verify the cart item is not in the database
             var dbCartItem = await _context.CartItems.FindAsync(result.ItemId, result.UserId);
@@ -205,8 +205,8 @@ namespace AsianMarketplace_WebAPI.Tests.Controllers
             var quantity = cartItems.FirstOrDefault().Quantity;
 
             // Store the first record and return it, to test
-            var firstItem = new CartItem { ItemId = itemId, UserId = userId, Quantity = quantity };
-            return firstItem;
+            var firstRecord = new CartItem { ItemId = itemId, UserId = userId, Quantity = quantity };
+            return firstRecord;
         }
     }
 }
