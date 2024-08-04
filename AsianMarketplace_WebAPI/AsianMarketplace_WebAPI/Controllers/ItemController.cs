@@ -57,6 +57,7 @@ namespace AsianMarketplace_WebAPI.Controllers
             {
                 // Gather items into a list
                 var items = await _marketplaceDbContext.Items
+                .OrderBy(i => i.Name)
                 .Include(i => i.CartItems)
                 .Include(i => i.OrderItems)
                 .Include(i => i.ShoppingListItems)
