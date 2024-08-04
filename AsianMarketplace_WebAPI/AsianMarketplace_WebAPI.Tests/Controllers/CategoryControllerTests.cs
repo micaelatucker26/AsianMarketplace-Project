@@ -16,13 +16,13 @@ using Moq;
 
 namespace AsianMarketplace_WebAPI.Tests.Controllers
 {
-    public class CartItemControllerTests
+    public class CategoryControllerTests
     {
         private readonly AsianMarketplaceDbContext _context;
         private readonly Mock<IMapper> _mockMapper;
-        private readonly CartItemController _controller;
+        private readonly CategoryController _controller;
 
-        public CartItemControllerTests()
+        public CategoryControllerTests()
         {
             var options = new DbContextOptionsBuilder<AsianMarketplaceDbContext>
                 ().UseInMemoryDatabase(databaseName: "TestDatabase")
