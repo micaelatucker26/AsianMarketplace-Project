@@ -2,6 +2,8 @@ using AsianMarketplace_WebAPI.DTOs;
 using AsianMarketplace_WebAPI.Models;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,7 +27,11 @@ builder.Services.AddSingleton(mapper);
 builder.Services.AddDbContext<AsianMarketplaceDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+     .AddNewtonsoftJson(options =>
+     {
+         options.SerializerSettings.DateFormatString = "yyyy-MM-dd";
+     });
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

@@ -66,7 +66,7 @@ create table OrderItem (
 	Quantity int not null CHECK (Quantity >= 1),
 	ItemID uniqueidentifier not null,
 	OrderID uniqueidentifier not null,
-	PRIMARY KEY (ItemID, OrderID),
+	primary key (ItemID, OrderID),
 	constraint OrderItem_ItemID_FK foreign key (ItemID) references Item(ItemID),
 	constraint OrderItem_OrderID_FK foreign key (OrderID) references [Order](OrderID)
 );
@@ -108,11 +108,11 @@ create table ShoppingListItem (
 	UserID varchar(25) not null,
 	ItemID uniqueidentifier not null,
 	Primary Key (Title, UserID, ItemID),
-	CONSTRAINT ShoppingListItem_ShoppingList_FK FOREIGN KEY (Title, UserID)
-        REFERENCES ShoppingList (Title, UserID),
-    CONSTRAINT ShoppingListItem_Item_FK FOREIGN KEY (ItemID)
-        REFERENCES Item (ItemID)
-		ON DELETE CASCADE
+	constraint ShoppingListItem_ShoppingList_FK foreign key (Title, UserID)
+        references ShoppingList (Title, UserID),
+    constraint ShoppingListItem_Item_FK foreign key (ItemID)
+        references Item (ItemID)
+		on delete cascade
 );
 
 
