@@ -16,10 +16,10 @@ namespace AsianMarketplace_WebAPI.Models
         {
         }
 
-        public virtual DbSet<CartItem> CartItems { get; set; }
+        public virtual DbSet<CartItem> CartItems { get; set; } = null!;
         public virtual DbSet<CartView> CartViews { get; set; } = null!;
         public virtual DbSet<Category> Categories { get; set; } = null!;
-        public virtual DbSet<Item> Items { get; set; }
+        public virtual DbSet<Item> Items { get; set; } = null!;
         public virtual DbSet<Order> Orders { get; set; } = null!;
         public virtual DbSet<OrderItem> OrderItems { get; set; } = null!;
         public virtual DbSet<Shopper> Shoppers { get; set; } = null!;
