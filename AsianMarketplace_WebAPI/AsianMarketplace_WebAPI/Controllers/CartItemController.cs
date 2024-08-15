@@ -1,4 +1,5 @@
 ﻿using AsianMarketplace_WebAPI.DTOs;
+using AsianMarketplace_WebAPI.Interfaces;
 using AsianMarketplace_WebAPI.Models;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
@@ -10,13 +11,13 @@ namespace AsianMarketplace_WebAPI.Controllers
     [Route("api/[controller]")]
     public class CartItemController : Controller
     {
-        private readonly AsianMarketplaceDbContext _marketplaceDbContext;
         private readonly IMapper _mapper;
+        private readonly ICartItemRepo _cartItemRepo;
 
-        public CartItemController(AsianMarketplaceDbContext marketplaceDbContext, IMapper mapper)
+        public CartItemController( IMapper mapper, ICartItemRepo cartItemRepo)
         {
-            _marketplaceDbContext = marketplaceDbContext;
             _mapper = mapper;
+            _cartItemRepo = cartItemRepo;
         }
 
         [HttpPost]
@@ -28,10 +29,7 @@ namespace AsianMarketplace_WebAPI.Controllers
                 var newCartItem = _mapper.Map<CartItem>(cartItemDTO);
 
                 // Add the new cart item to the context
-                _marketplaceDbContext.CartItems.Add(newCartItem);
-
-                // Save changes to the database
-                await _marketplaceDbContext.SaveChangesAsync();
+                await _cartItemRepo.CreateCartItem(newCartItem);
 
                 // Return that cart item's details (including quantity, itemId, and userId)
                 return
@@ -56,7 +54,7 @@ namespace AsianMarketplace_WebAPI.Controllers
             try
             {
                 // Gather cart items into a list
-                var cartItems = await _marketplaceDbContext.CartItems.ToListAsync();
+                var cartItems = await _cartItemRepo.GetCartItems();
                 if(cartItems == null)
                 {
                     return NotFound();
@@ -76,7 +74,7 @@ namespace AsianMarketplace_WebAPI.Controllers
         public async Task<ActionResult<CartItemDTO>> GetCartItem(Guid itemId, string userId)
         {
             // Fetch the existing cart item from the database
-            var cartItem = await _marketplaceDbContext.CartItems.FindAsync(itemId, userId);
+            var cartItem = await _cartItemRepo.GetCartItem(itemId, userId);
 
             if (cartItem == null)
             {
@@ -99,7 +97,7 @@ namespace AsianMarketplace_WebAPI.Controllers
         public async Task<IActionResult> UpdateCartItem( Guid itemId, string userId, [FromBody] CartItemDTO cartItemDTO)
         {
             // Fetch the existing cart item from the database
-            var cartItem =  await _marketplaceDbContext.CartItems.FindAsync(itemId, userId);
+            var cartItem =  await _cartItemRepo.UpdateCartItem(itemId, userId, cartItemDTO);
             if (cartItem == null)
             {
                 return NotFound();
@@ -107,14 +105,6 @@ namespace AsianMarketplace_WebAPI.Controllers
 
             try
             {
-                // The quantity will be updated
-                cartItem.Quantity = cartItemDTO.Quantity;
-                cartItemDTO.ItemId = itemId;
-                cartItemDTO.UserId = userId;
-
-                // Save changes to the database
-                await _marketplaceDbContext.SaveChangesAsync();
-
                 // Return a response
                 return NoContent();
             }
@@ -129,19 +119,13 @@ namespace AsianMarketplace_WebAPI.Controllers
         public async Task<IActionResult> DeleteCartItem(Guid itemId, string userId)
         {
             // Fetch the existing cart item from the database
-            var cartItem = await _marketplaceDbContext.CartItems.FindAsync(itemId, userId);
+            var cartItem = await _cartItemRepo.DeleteCartItem(itemId, userId);
             if (cartItem == null)
             {
                 return NotFound();
             }
             try
             {
-                // Remove that cart item from the database
-                _marketplaceDbContext.CartItems.Remove(cartItem);
-
-                // Save changes to the database
-                await _marketplaceDbContext.SaveChangesAsync();
-
                 return NoContent();
             }
             catch (Exception ex)
