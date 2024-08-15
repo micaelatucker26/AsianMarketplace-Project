@@ -1,4 +1,5 @@
 ﻿using AsianMarketplace_WebAPI.DTOs;
+using AsianMarketplace_WebAPI.Interfaces;
 using AsianMarketplace_WebAPI.Models;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
@@ -10,13 +11,13 @@ namespace AsianMarketplace_WebAPI.Controllers
     [Route("api/[controller]")]
     public class CategoryController : Controller
     {
-        private readonly AsianMarketplaceDbContext _marketplaceDbContext;
         private readonly IMapper _mapper;
+        private readonly ICategoryRepo _categoryRepo;
 
-        public CategoryController(AsianMarketplaceDbContext marketplaceDbContext, IMapper mapper)
+        public CategoryController(IMapper mapper, ICategoryRepo repo)
         {
-            _marketplaceDbContext = marketplaceDbContext;
             _mapper = mapper;
+            _categoryRepo = repo;
         }
 
         [HttpPost]
@@ -28,10 +29,7 @@ namespace AsianMarketplace_WebAPI.Controllers
                 var newCategory = _mapper.Map<Category>(categoryDTO);
 
                 // Add the new category to the context
-                _marketplaceDbContext.Categories.Add(newCategory);
-
-                // Save changes to the database
-                await _marketplaceDbContext.SaveChangesAsync();
+                await _categoryRepo.CreateCategory(newCategory);
 
                 // Return that category's details (including the category name)
                 return
@@ -56,10 +54,7 @@ namespace AsianMarketplace_WebAPI.Controllers
             try
             {
                 // Gather categories into a list
-                var categories = await _marketplaceDbContext.Categories
-                .Include(c => c.SubCategories)
-                     .ThenInclude(sc => sc.Items)
-                .ToListAsync();
+                var categories = await _categoryRepo.GetCategories();
                 if (categories == null)
                 {
                     return NotFound();
@@ -79,10 +74,8 @@ namespace AsianMarketplace_WebAPI.Controllers
         public async Task<ActionResult<CategoryDTO>> GetCategory(string name)
         {
             // Fetch the existing category from the database
-            var category = await _marketplaceDbContext.Categories
-                .Include(c => c.SubCategories)
-                .ThenInclude(sc => sc.Items)
-                .FirstOrDefaultAsync(c => c.Name == name); 
+            var category = await _categoryRepo.GetCategory(name);
+
             if (category == null)
             {
                 return NotFound();
@@ -101,51 +94,39 @@ namespace AsianMarketplace_WebAPI.Controllers
         }
 
 
-        [HttpPut("{name}")]
-        public async Task<IActionResult> UpdateCategory(string name, [FromBody] CategoryDTO categoryDTO)
-        {
+        //[HttpPut("{name}")]
+        //public async Task<IActionResult> UpdateCategory(string name, [FromBody] CategoryDTO categoryDTO)
+        //{
             // Fetch the existing category from the database
-            var category =  await _marketplaceDbContext.Categories.FindAsync(name);
-            if (category == null)
-            {
-                return NotFound();
-            }
+            //var category = await _categoryRepo.UpdateCategory(name, categoryDTO);
+            //if (category == null)
+            //{
+            //    return NotFound();
+            //}
 
-            try
-            {
-                // The category name will be updated
-                category.Name = categoryDTO.Name;
-
-                // Save changes to the database
-                await _marketplaceDbContext.SaveChangesAsync();
-
-                // Return a response
-                return NoContent();
-            }
-            catch (Exception ex)
-            {
-                // Handle other exceptions
-                return StatusCode(StatusCodes.Status500InternalServerError, new { Message = "An unexpected error occurred.", Details = ex.Message });
-            }
-        }
+            //try
+            //{
+            //    // Return a response
+            //    return NoContent();
+            //}
+            //catch (Exception ex)
+            //{
+            //    // Handle other exceptions
+            //    return StatusCode(StatusCodes.Status500InternalServerError, new { Message = "An unexpected error occurred.", Details = ex.Message });
+            //}
+        //}
 
         [HttpDelete("{name}")]
         public async Task<IActionResult> DeleteCategory(string name)
         {
             // Fetch the existing category from the database
-            var category = await _marketplaceDbContext.Categories.FindAsync(name);
+            var category = await _categoryRepo.DeleteCategory(name);
             if (category == null)
             {
                 return NotFound();
             }
             try
             {
-                // Remove the category from the database
-                _marketplaceDbContext.Categories.Remove(category);
-
-                // Save changes to the database
-                await _marketplaceDbContext.SaveChangesAsync();
-
                 return NoContent();
             }
             catch (Exception ex)

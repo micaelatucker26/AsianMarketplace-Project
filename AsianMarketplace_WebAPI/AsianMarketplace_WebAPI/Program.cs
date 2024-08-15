@@ -1,5 +1,7 @@
 using AsianMarketplace_WebAPI.DTOs;
+using AsianMarketplace_WebAPI.Interfaces;
 using AsianMarketplace_WebAPI.Models;
+using AsianMarketplace_WebAPI.Repository;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel;
@@ -36,6 +38,8 @@ builder.Services.AddControllers()
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddScoped<ICartItemRepo, CartItemRepository>();
+builder.Services.AddScoped<ICategoryRepo, CategoryRepository>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
