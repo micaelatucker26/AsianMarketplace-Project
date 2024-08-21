@@ -75,7 +75,6 @@ namespace AsianMarketplace_WebAPI.Controllers
         {
             // Fetch the existing category from the database
             var category = await _categoryRepo.GetCategory(name);
-
             if (category == null)
             {
                 return NotFound();
@@ -94,39 +93,38 @@ namespace AsianMarketplace_WebAPI.Controllers
         }
 
 
-        //[HttpPut("{name}")]
-        //public async Task<IActionResult> UpdateCategory(string name, [FromBody] CategoryDTO categoryDTO)
-        //{
-            // Fetch the existing category from the database
-            //var category = await _categoryRepo.UpdateCategory(name, categoryDTO);
-            //if (category == null)
-            //{
-            //    return NotFound();
-            //}
-
-            //try
-            //{
-            //    // Return a response
-            //    return NoContent();
-            //}
-            //catch (Exception ex)
-            //{
-            //    // Handle other exceptions
-            //    return StatusCode(StatusCodes.Status500InternalServerError, new { Message = "An unexpected error occurred.", Details = ex.Message });
-            //}
-        //}
+        [HttpPut("{name}")]
+        public async Task<IActionResult> UpdateCategory(string name, [FromBody] CategoryDTO categoryDTO)
+        {
+            try
+            {
+                //Fetch the existing category from the database
+                var category = await _categoryRepo.UpdateCategory(name, categoryDTO);
+                if (category == null)
+                {
+                    return NotFound();
+                }
+                // Return a response
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                // Handle other exceptions
+                return StatusCode(StatusCodes.Status500InternalServerError, new { Message = "An unexpected error occurred.", Details = ex.Message });
+            }
+        }
 
         [HttpDelete("{name}")]
         public async Task<IActionResult> DeleteCategory(string name)
         {
-            // Fetch the existing category from the database
-            var category = await _categoryRepo.DeleteCategory(name);
-            if (category == null)
-            {
-                return NotFound();
-            }
             try
             {
+                // Fetch the existing category from the database
+                var category = await _categoryRepo.DeleteCategory(name);
+                if (category == null)
+                {
+                    return NotFound();
+                }
                 return NoContent();
             }
             catch (Exception ex)

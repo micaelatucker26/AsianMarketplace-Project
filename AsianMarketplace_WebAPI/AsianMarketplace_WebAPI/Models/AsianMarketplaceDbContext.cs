@@ -17,7 +17,6 @@ namespace AsianMarketplace_WebAPI.Models
         }
 
         public virtual DbSet<CartItem> CartItems { get; set; } = null!;
-        public virtual DbSet<CartView> CartViews { get; set; } = null!;
         public virtual DbSet<Category> Categories { get; set; } = null!;
         public virtual DbSet<Item> Items { get; set; } = null!;
         public virtual DbSet<Order> Orders { get; set; } = null!;
@@ -25,7 +24,6 @@ namespace AsianMarketplace_WebAPI.Models
         public virtual DbSet<Shopper> Shoppers { get; set; } = null!;
         public virtual DbSet<ShoppingList> ShoppingLists { get; set; } = null!;
         public virtual DbSet<ShoppingListItem> ShoppingListItems { get; set; } = null!;
-        public virtual DbSet<ShoppingListView> ShoppingListViews { get; set; } = null!;
         public virtual DbSet<SubCategory> SubCategories { get; set; } = null!;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -42,7 +40,7 @@ namespace AsianMarketplace_WebAPI.Models
             modelBuilder.Entity<CartItem>(entity =>
             {
                 entity.HasKey(e => new { e.ItemId, e.UserId })
-                    .HasName("PK__CartItem__A3060F21D138CD66");
+                    .HasName("PK__CartItem__A3060F2106CCBB11");
 
                 entity.ToTable("CartItem");
 
@@ -56,46 +54,17 @@ namespace AsianMarketplace_WebAPI.Models
                 entity.HasOne(d => d.Item)
                     .WithMany(p => p.CartItems)
                     .HasForeignKey(d => d.ItemId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("CartItem_ItemID_FK");
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.CartItems)
                     .HasForeignKey(d => d.UserId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("CartItem_UserID_FK");
-            });
-
-            modelBuilder.Entity<CartView>(entity =>
-            {
-                entity.HasNoKey();
-
-                entity.ToView("CartView");
-
-                entity.Property(e => e.ImageUrl)
-                    .HasMaxLength(255)
-                    .IsUnicode(false)
-                    .HasColumnName("ImageURL");
-
-                entity.Property(e => e.ItemName)
-                    .HasMaxLength(100)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.Price).HasColumnType("money");
-
-                entity.Property(e => e.SubCategory)
-                    .HasMaxLength(25)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.Username)
-                    .HasMaxLength(25)
-                    .IsUnicode(false);
             });
 
             modelBuilder.Entity<Category>(entity =>
             {
-                entity.HasKey(e => e.Name)
-                    .HasName("PK__Category__737584F765D26862");
+                entity.HasKey(e => e.CategoryID);
 
                 entity.ToTable("Category");
 
@@ -122,7 +91,7 @@ namespace AsianMarketplace_WebAPI.Models
                     .HasColumnName("ImageURL");
 
                 entity.Property(e => e.Name)
-                    .HasMaxLength(100)
+                    .HasMaxLength(50)
                     .IsUnicode(false);
 
                 entity.Property(e => e.Price).HasColumnType("money");
@@ -131,10 +100,10 @@ namespace AsianMarketplace_WebAPI.Models
                     .HasMaxLength(25)
                     .IsUnicode(false);
 
-                entity.HasOne(d => d.SubCategory)
+                entity.HasOne(d => d.SubCategoryNameNavigation)
                     .WithMany(p => p.Items)
                     .HasForeignKey(d => d.SubCategoryName)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .OnDelete(DeleteBehavior.SetNull)
                     .HasConstraintName("SubCategory_FK");
             });
 
@@ -152,7 +121,7 @@ namespace AsianMarketplace_WebAPI.Models
                     .HasMaxLength(25)
                     .IsUnicode(false);
 
-                entity.HasOne(d => d.Shopper)
+                entity.HasOne(d => d.UsernameNavigation)
                     .WithMany(p => p.Orders)
                     .HasForeignKey(d => d.Username)
                     .OnDelete(DeleteBehavior.ClientSetNull)
@@ -162,7 +131,7 @@ namespace AsianMarketplace_WebAPI.Models
             modelBuilder.Entity<OrderItem>(entity =>
             {
                 entity.HasKey(e => new { e.ItemId, e.OrderId })
-                    .HasName("PK__OrderIte__9E47865198DC9792");
+                    .HasName("PK__OrderIte__9E478651E5C85267");
 
                 entity.ToTable("OrderItem");
 
@@ -175,20 +144,18 @@ namespace AsianMarketplace_WebAPI.Models
                 entity.HasOne(d => d.Item)
                     .WithMany(p => p.OrderItems)
                     .HasForeignKey(d => d.ItemId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("OrderItem_ItemID_FK");
 
                 entity.HasOne(d => d.Order)
                     .WithMany(p => p.OrderItems)
                     .HasForeignKey(d => d.OrderId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("OrderItem_OrderID_FK");
             });
 
             modelBuilder.Entity<Shopper>(entity =>
             {
                 entity.HasKey(e => e.Username)
-                    .HasName("PK__Shopper__536C85E56F485FFA");
+                    .HasName("PK__Shopper__536C85E55B620307");
 
                 entity.ToTable("Shopper");
 
@@ -204,7 +171,7 @@ namespace AsianMarketplace_WebAPI.Models
             modelBuilder.Entity<ShoppingList>(entity =>
             {
                 entity.HasKey(e => new { e.Title, e.UserId })
-                    .HasName("PK__Shopping__FDCEE8179895B4E6");
+                    .HasName("PK__Shopping__FDCEE8177E466141");
 
                 entity.ToTable("ShoppingList");
 
@@ -222,19 +189,19 @@ namespace AsianMarketplace_WebAPI.Models
                 entity.Property(e => e.IsActive)
                     .HasMaxLength(1)
                     .IsUnicode(false)
+                    .HasDefaultValueSql("('N')")
                     .IsFixedLength();
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.ShoppingLists)
                     .HasForeignKey(d => d.UserId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("ShoppingList_UserID_FK");
             });
 
             modelBuilder.Entity<ShoppingListItem>(entity =>
             {
                 entity.HasKey(e => new { e.Title, e.UserId, e.ItemId })
-                    .HasName("PK__Shopping__17BC9694755B20B3");
+                    .HasName("PK__Shopping__17BC9694005304B1");
 
                 entity.ToTable("ShoppingListItem");
 
@@ -258,59 +225,18 @@ namespace AsianMarketplace_WebAPI.Models
                 entity.HasOne(d => d.Item)
                     .WithMany(p => p.ShoppingListItems)
                     .HasForeignKey(d => d.ItemId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("ShoppingListItem_Item_FK");
 
                 entity.HasOne(d => d.ShoppingList)
                     .WithMany(p => p.ShoppingListItems)
                     .HasForeignKey(d => new { d.Title, d.UserId })
-                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("ShoppingListItem_ShoppingList_FK");
-            });
-
-            modelBuilder.Entity<ShoppingListView>(entity =>
-            {
-                entity.HasNoKey();
-
-                entity.ToView("ShoppingListView");
-
-                entity.Property(e => e.Description)
-                    .HasMaxLength(1000)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.ImageUrl)
-                    .HasMaxLength(255)
-                    .IsUnicode(false)
-                    .HasColumnName("ImageURL");
-
-                entity.Property(e => e.IsCrossedOff)
-                    .HasMaxLength(1)
-                    .IsUnicode(false)
-                    .IsFixedLength();
-
-                entity.Property(e => e.ItemName)
-                    .HasMaxLength(100)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.Price).HasColumnType("money");
-
-                entity.Property(e => e.SubCategoryName)
-                    .HasMaxLength(25)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.Title)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.Username)
-                    .HasMaxLength(25)
-                    .IsUnicode(false);
             });
 
             modelBuilder.Entity<SubCategory>(entity =>
             {
                 entity.HasKey(e => e.Name)
-                    .HasName("PK__SubCateg__737584F7B31ED1D6");
+                    .HasName("PK__SubCateg__737584F73EE87B95");
 
                 entity.ToTable("SubCategory");
 
@@ -322,11 +248,10 @@ namespace AsianMarketplace_WebAPI.Models
                     .HasMaxLength(25)
                     .IsUnicode(false);
 
-                entity.HasOne(d => d.CategoryNameNavigation)
-                    .WithMany(p => p.SubCategories)
-                    .HasForeignKey(d => d.CategoryName)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("Category_FK");
+                //entity.HasOne(d => d.CategoryNameNavigation)
+                //    .WithMany(p => p.SubCategories)
+                //    .HasForeignKey(d => d.CategoryName)
+                //    .HasConstraintName("Category_FK");
             });
 
             OnModelCreatingPartial(modelBuilder);

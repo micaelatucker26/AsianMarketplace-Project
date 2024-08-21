@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\build\AsianMarketplace_WebAPI.props" />
+</Project>

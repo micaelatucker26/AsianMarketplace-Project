@@ -18,13 +18,9 @@ namespace AsianMarketplace_WebAPI.Models
         public int Quantity { get; set; }
         public decimal Price { get; set; }
         public string ImageUrl { get; set; } = null!;
-        public string SubCategoryName { get; set; } = null!;
+        public string? SubCategoryName { get; set; }
 
-        // These fields are virtual to allow EF Core to override
-        // these properties in derived classes and to allow lazy loading
-        // that delays loading their values from the db until accessed the
-        // first time
-        public virtual SubCategory SubCategory { get; set; } = null!;
+        public virtual SubCategory? SubCategoryNameNavigation { get; set; }
         public virtual ICollection<CartItem> CartItems { get; set; }
         public virtual ICollection<OrderItem> OrderItems { get; set; }
         public virtual ICollection<ShoppingListItem> ShoppingListItems { get; set; }

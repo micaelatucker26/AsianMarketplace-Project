@@ -8,7 +8,7 @@ namespace AsianMarketplace_WebAPI.Interfaces
         Task<List<Category>> GetCategories();
         Task<Category> GetCategory(string name);
         Task<Category> CreateCategory(Category category);
-        //Task<Category> UpdateCategory(string name, CategoryDTO categoryDTO);
+        Task<Category> UpdateCategory(string name, CategoryDTO categoryDTO);
         Task<Category> DeleteCategory(string name);
     }
 }

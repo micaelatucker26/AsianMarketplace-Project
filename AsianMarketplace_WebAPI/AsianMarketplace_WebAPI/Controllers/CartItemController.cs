@@ -28,13 +28,21 @@ namespace AsianMarketplace_WebAPI.Controllers
                 // Map the DTO to the entity
                 var newCartItem = _mapper.Map<CartItem>(cartItemDTO);
 
-                // Add the new cart item to the context
-                await _cartItemRepo.CreateCartItem(newCartItem);
+                if (cartItemDTO.Quantity > 0)
+                {
+                    // Add the new cart item to the context
+                    await _cartItemRepo.CreateCartItem(newCartItem);
 
-                // Return that cart item's details (including quantity, itemId, and userId)
-                return
-                    CreatedAtAction(nameof(GetCartItem),
-                    new { itemId = newCartItem.ItemId, userId = newCartItem.UserId }, cartItemDTO);
+                    // Return that cart item's details (including quantity, itemId, and userId)
+                    return
+                        CreatedAtAction(nameof(GetCartItem),
+                        new { itemId = newCartItem.ItemId, userId = newCartItem.UserId }, cartItemDTO);
+                }
+                else
+                {
+                    return StatusCode(StatusCodes.Status400BadRequest, new { Message = "The cart item quantity must be greater than zero." });
+                }
+           
             }
             catch(DbUpdateException ex)
             {
@@ -96,15 +104,21 @@ namespace AsianMarketplace_WebAPI.Controllers
         [HttpPut("{itemId}/{userId}")]
         public async Task<IActionResult> UpdateCartItem( Guid itemId, string userId, [FromBody] CartItemDTO cartItemDTO)
         {
-            // Fetch the existing cart item from the database
-            var cartItem =  await _cartItemRepo.UpdateCartItem(itemId, userId, cartItemDTO);
-            if (cartItem == null)
-            {
-                return NotFound();
-            }
-
             try
             {
+                if (cartItemDTO.Quantity > 0)
+                {
+                    // Fetch the existing cart item from the database
+                    var cartItem = await _cartItemRepo.UpdateCartItem(itemId, userId, cartItemDTO);
+                    if (cartItem == null)
+                    {
+                        return NotFound();
+                    }
+                }
+                else
+                {
+                    return StatusCode(StatusCodes.Status400BadRequest, new { Message = "The cart item quantity must be greater than zero." });
+                }
                 // Return a response
                 return NoContent();
             }
@@ -118,14 +132,14 @@ namespace AsianMarketplace_WebAPI.Controllers
         [HttpDelete("{itemId}/{userId}")]
         public async Task<IActionResult> DeleteCartItem(Guid itemId, string userId)
         {
-            // Fetch the existing cart item from the database
-            var cartItem = await _cartItemRepo.DeleteCartItem(itemId, userId);
-            if (cartItem == null)
-            {
-                return NotFound();
-            }
             try
             {
+                // Fetch the existing cart item from the database
+                var cartItem = await _cartItemRepo.DeleteCartItem(itemId, userId);
+                if (cartItem == null)
+                {
+                    return NotFound();
+                }
                 return NoContent();
             }
             catch (Exception ex)

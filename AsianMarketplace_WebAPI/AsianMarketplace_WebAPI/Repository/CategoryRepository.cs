@@ -25,7 +25,11 @@ namespace AsianMarketplace_WebAPI.Repository
 
         public async Task<Category> DeleteCategory(string name)
         {
-            var category = await _marketplaceDbContext.Categories.FindAsync(name);
+            var category = await _marketplaceDbContext.Categories.FirstOrDefaultAsync(c => c.Name == name);
+            if (category == null)
+            {
+                return null;
+            }
             // Remove the category from the database
             _marketplaceDbContext.Categories.Remove(category);
 
@@ -37,24 +41,37 @@ namespace AsianMarketplace_WebAPI.Repository
 
         public async Task<List<Category>> GetCategories()
         {
-           return await _marketplaceDbContext.Categories.ToListAsync(); 
+            var categories = await _marketplaceDbContext.Categories.ToListAsync();
+            if(categories == null)
+            {
+                return null;
+            }
+            return categories;
         }
 
         public async Task<Category> GetCategory(string name)
         {
-            return await _marketplaceDbContext.Categories.FindAsync(name);
+            var category = await _marketplaceDbContext.Categories.FirstOrDefaultAsync( c => c.Name == name);
+            if(category == null)
+            {
+                return null;
+            }
+            return category;
         }
 
-        //public async Task<Category> UpdateCategory(string name, CategoryDTO categoryDTO)
-        //{
-            //var existingCategory = await _marketplaceDbContext.Categories.FindAsync(name);
+        public async Task<Category> UpdateCategory(string name, CategoryDTO categoryDTO)
+        {
+            var existingCategory = await _marketplaceDbContext.Categories.FirstOrDefaultAsync(c => c.Name == name);
 
-            //// The category name will be updated
-            //existingCategory.Name = categoryDTO.Name;
-
-            //// Save changes to the database
-            //await _marketplaceDbContext.SaveChangesAsync();
-            //return existingCategory;
-        //}
+            if (existingCategory == null)
+            {
+                return null;
+            }
+            // The category name will be updated
+            existingCategory.Name = categoryDTO.Name;
+            // Save changes to the database
+            await _marketplaceDbContext.SaveChangesAsync();
+            return existingCategory;         
+        }
     }
 }

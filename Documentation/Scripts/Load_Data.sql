@@ -38,10 +38,10 @@ insert into SubCategory (Name, CategoryName) values ('Chocolates', 'Sweets');
 insert into SubCategory (Name, CategoryName) values ('Candies', 'Sweets');
 
 -- Shopper table data
-insert into Shopper (Username, Password, Salt) values ('MTucker27', 'sq@kmk_12l');
-insert into Shopper (Username, Password, Salt) values ('JHigginbotham26', 'peanuts');
-insert into Shopper (Username, Password, Salt) values ('DBishop123', 'mushroomKingdom');
-insert into Shopper (Username, Password, Salt) values ('ALord35','dar2thV3ader');
+insert into Shopper (Username, Password) values ('MTucker27', 'sq@kmk_12l');
+insert into Shopper (Username, Password) values ('JHigginbotham26', 'peanuts');
+insert into Shopper (Username, Password) values ('DBishop123', 'mushroomKingdom');
+insert into Shopper (Username, Password) values ('ALord35','dar2thV3ader');
 
 -- Order table data
 insert into [Order] (OrderDate, Username) values (GETDATE(), 'MTucker27');
@@ -140,9 +140,9 @@ options. Join Sailor Moon on her adventures with each sip of this yummy drink! E
 all the characters by trying different flavors!', 150, 3.99, 
 'https://www.bokksumarket.com/collections/water/products/ocean-bomb-sailor-moon-sparkling-water-pomelo', 'Water');
 
--- OrderItem table data
+-- OrderItem table data (Must contain a valid ItemID and OrderID from the related tables)
 insert into OrderItem (Price, Quantity, ItemID, OrderID) VALUES (3.99, 3, 
-'B3858A04-EAC2-4503-B255-566995032A83', 'C90CEF64-962B-4154-B47D-69DFB7E8B391');
+'A966C2F5-DB9D-420C-81DF-107020A75ADC', '298FC805-31F2-4ADE-90E4-2DA7DE99C830');
 
 -- ShoppingList table data
 insert into ShoppingList (Title, IsActive, DateCreated, UserID) values 
@@ -160,25 +160,25 @@ insert into ShoppingList (Title, IsActive, DateCreated, UserID) values
 insert into ShoppingList (Title, IsActive, DateCreated, UserID) values 
 ('Monday List', 'N', GETDATE(), 'ALord35');
 
--- ShoppingListItem table data
+-- ShoppingListItem table data (Must contain a valid ItemID from the related table)
 insert into ShoppingListItem (IsCrossedOff, Quantity, Title, UserID, ItemID) values
-(NULL, 1, 'Weekend Shopping List', 'DBishop123', 'AA0C9F06-CDAC-40D3-AB3A-F26B953F00BC');
+(NULL, 1, 'Weekend Shopping List', 'DBishop123', 'A966C2F5-DB9D-420C-81DF-107020A75ADC');
 
 -- CartItem table data
 insert into CartItem (Quantity, ItemID, UserID) 
-values ( 1, 'AA0C9F06-CDAC-40D3-AB3A-F26B953F00BC', 'DBishop123');
+values ( 1, 'A966C2F5-DB9D-420C-81DF-107020A75ADC', 'DBishop123');
 
 insert into CartItem (Quantity, ItemID, UserID) 
-values ( 2, 'AA0C9F06-CDAC-40D3-AB3A-F26B953F00BC', 'MTucker27');
+values ( 2, '36C3E305-50A4-4791-94E1-20AABF6E2E0D', 'MTucker27');
 
 insert into CartItem (Quantity, ItemID, UserID) 
-values ( 6, '039E69F7-7326-4F29-AEDA-2F51EC3E29C3', 'DBishop123');
+values ( 6, '5BF44D46-635E-406A-AB01-289B4391E4E6', 'DBishop123');
 
 insert into CartItem (Quantity, ItemID, UserID)
-values ( 3, 'B3858A04-EAC2-4503-B255-566995032A83', 'DBishop123');
+values ( 3, '4AE45DCC-B590-4DCE-8448-4299EC65C00F', 'DBishop123');
 
  insert into CartItem (Quantity, ItemID, UserID)
- values (10, '3D9E50F2-7CD7-47E1-A144-90EDD25BFBF3' 'JHigginbotham26');
+ values (10, '24DCF64E-44DC-4A55-8964-49FE619793FB', 'JHigginbotham26');
 
  insert into CartItem (Quantity, ItemID, UserID)
- values (5, 'AA0C9F06-CDAC-40D3-AB3A-F26B953F00BC', 'JHigginbotham26');
+ values (5, '918C9994-7F86-4CB3-A45A-4B386083D55D', 'JHigginbotham26');
