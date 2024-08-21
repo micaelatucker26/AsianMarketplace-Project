@@ -35,13 +35,23 @@ namespace AsianMarketplace_WebAPI.Repository
 
         public async Task<CartItem> GetCartItem(Guid itemId, string userId)
         {
-           return await _marketplaceDbContext.CartItems.FindAsync(itemId, userId);
+            var cartItem = await _marketplaceDbContext.CartItems.FindAsync(itemId, userId);
+            if (cartItem == null)
+            {
+                return null;
+            }
+            return cartItem;
 
         }
 
         public async Task<List<CartItem>> GetCartItems()
         {
-            return await _marketplaceDbContext.CartItems.ToListAsync();
+            var cartItems = await _marketplaceDbContext.CartItems.ToListAsync();
+            if(cartItems == null)
+            {
+                return null;
+            }
+            return cartItems;
         }
 
         public async Task<CartItem> UpdateCartItem(Guid itemId, string userId, CartItemDTO cartItemDTO)

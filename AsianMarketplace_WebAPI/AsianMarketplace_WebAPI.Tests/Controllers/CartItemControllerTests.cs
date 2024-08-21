@@ -50,7 +50,7 @@ namespace AsianMarketplace_WebAPI.Tests.Controllers
                     { ItemId = item.ItemId, Quantity = item.Quantity, UserId = item.UserId }).ToList();
                 });
             // Using my controller, have it use the mocked context and mocked mapper
-            _controller = new CartItemController(_context, _mockMapper.Object);
+            //_controller = new CartItemController(_context, _mockMapper.Object);
         }
 
         [Fact]

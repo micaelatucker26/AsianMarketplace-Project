@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("AsianMarketplace_WebAPI")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c84b9dc0937afddb4c4ceee54c13d92a5d702bba")]
 [assembly: System.Reflection.AssemblyProductAttribute("AsianMarketplace_WebAPI")]
 [assembly: System.Reflection.AssemblyTitleAttribute("AsianMarketplace_WebAPI")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

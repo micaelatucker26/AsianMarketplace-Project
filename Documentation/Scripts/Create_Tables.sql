@@ -1,4 +1,5 @@
-create database AsianMarketplaceDb;
+--drop database AsianMarketplaceDb
+--create database AsianMarketplaceDb;
 use AsianMarketplaceDb;
 
 
@@ -15,8 +16,9 @@ create table SubCategory (
 	Name varchar(25) primary key,
 	CategoryName varchar(25) not null
 	constraint Category_FK foreign key (CategoryName) 
-	references Category(Name)
-	on delete cascade
+		references Category(Name)
+			on delete cascade
+			on update cascade
 );
 
 
@@ -38,7 +40,8 @@ create table [Order] (
 	OrderID uniqueidentifier primary key default newid(),
 	OrderDate datetime not null,
 	Username varchar(25) not null,
-    constraint Shopper_FK foreign key (Username) references Shopper(Username)
+    constraint Shopper_FK foreign key (Username) 
+		references Shopper(Username)
 );
 
 
@@ -52,8 +55,10 @@ create table Item (
 	Quantity int not null default 0,
 	Price money not null check (Price >= 0),
 	ImageURL varchar(255) not null,
-	SubCategoryName varchar(25) not null,
-	constraint SubCategory_FK foreign key (SubCategoryName) references SubCategory(Name)
+	SubCategoryName varchar(25) null,
+	constraint SubCategory_FK foreign key (SubCategoryName) 
+		references SubCategory(Name)
+			on delete set null
 );
 
 
@@ -67,17 +72,13 @@ create table OrderItem (
 	ItemID uniqueidentifier not null,
 	OrderID uniqueidentifier not null,
 	primary key (ItemID, OrderID),
-	constraint OrderItem_ItemID_FK foreign key (ItemID) references Item(ItemID),
-	constraint OrderItem_OrderID_FK foreign key (OrderID) references [Order](OrderID)
+	constraint OrderItem_ItemID_FK foreign key (ItemID) 
+		references Item(ItemID)
+			on delete cascade,
+	constraint OrderItem_OrderID_FK foreign key (OrderID) 
+		references [Order](OrderID)
+			on delete cascade
 );
-
-
---This table isn't used but could be, if Employee activity is tracked later.
---create table Employee (
---	Username varchar(25) primary key,
---	Password varchar(255),
---	Salt varchar(255)
---);
 
 
 -- Create a table named ShoppingList that stores information on a shopping list that has been created by
@@ -92,7 +93,9 @@ create table ShoppingList (
 	 DateCreated datetime not null,
 	 UserID varchar(25) not null,
 	 Primary Key (Title, UserID),
-	 constraint ShoppingList_UserID_FK foreign key (UserID) references Shopper(Username)
+	 constraint ShoppingList_UserID_FK foreign key (UserID) 
+		references Shopper(Username)
+			on delete cascade
 );
 
 
@@ -105,14 +108,15 @@ create table ShoppingListItem (
 	IsCrossedOff char(1) default 'N',
 	Quantity int not null check (Quantity >= 1),
 	Title varchar(50) not null,
-	UserID varchar(25) not null,
 	ItemID uniqueidentifier not null,
+	UserID varchar(25) not null,
 	Primary Key (Title, UserID, ItemID),
 	constraint ShoppingListItem_ShoppingList_FK foreign key (Title, UserID)
-        references ShoppingList (Title, UserID),
+        references ShoppingList (Title, UserID)
+			on delete cascade,
     constraint ShoppingListItem_Item_FK foreign key (ItemID)
         references Item (ItemID)
-		on delete cascade
+			on delete cascade
 );
 
 
@@ -124,6 +128,10 @@ create table CartItem (
 	ItemID uniqueidentifier not null,
 	UserID varchar(25) not null,
 	Primary Key (ItemID, UserID),
-	constraint CartItem_ItemID_FK foreign key (ItemID) references Item(ItemID),
-	constraint CartItem_UserID_FK foreign key (UserID) references Shopper(Username)
+	constraint CartItem_ItemID_FK foreign key (ItemID) 
+		references Item(ItemID)
+			on delete cascade,
+	constraint CartItem_UserID_FK foreign key (UserID) 
+		references Shopper(Username)
+			on delete cascade
 );

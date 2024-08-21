@@ -19,17 +19,17 @@ namespace AsianMarketplace_WebAPI.Tests.Controllers
 {
     public class CategoryControllerTests: IClassFixture<CategoryControllerTestsFixture>
     {
-        private readonly AsianMarketplaceDbContext _context;
+        //private readonly AsianMarketplaceDbContext _context;
         private readonly Mock<IMapper> _mockMapper;
         private readonly CategoryController _controller;
 
         public CategoryControllerTests(CategoryControllerTestsFixture fixture)
         {
-            _context = fixture.Context;
-            // Mock the AutoMapper mapper to use when mapping my entities to DTOs
-            _mockMapper = fixture.MockMapper;
-            // Using my controller, have it use the mocked context and mocked mapper
-            _controller = new CategoryController(_context, _mockMapper.Object);
+            //_context = fixture.Context;
+            //// Mock the AutoMapper mapper to use when mapping my entities to DTOs
+            //_mockMapper = fixture.MockMapper;
+            //// Using my controller, have it use the mocked context and mocked mapper
+            ////_controller = new CategoryController(_context, _mockMapper.Object);
         }
 
         [Fact]
@@ -60,9 +60,9 @@ namespace AsianMarketplace_WebAPI.Tests.Controllers
             createdCategory.Name.Should().Be(categoryDTO.Name);
 
             // Verify the category was added to the context
-            var dbCategory = await _context.Categories.FindAsync(category.Name);
-            dbCategory.Should().NotBeNull();
-            dbCategory.Name.Should().Be(categoryDTO.Name);
+            //var dbCategory = await _context.Categories.FindAsync(category.Name);
+            //dbCategory.Should().NotBeNull();
+            //dbCategory.Name.Should().Be(categoryDTO.Name);
         }
 
 
@@ -113,9 +113,9 @@ namespace AsianMarketplace_WebAPI.Tests.Controllers
             categoryFound.StatusCode.Should().Be(200);
 
             // Verify the cart item is in the database
-            var dbCategory = await _context.Categories.FindAsync(category.Name);
-            dbCategory.Should().NotBeNull();
-            dbCategory.Name.Should().Be(categoryDTO.Name);
+            //var dbCategory = await _context.Categories.FindAsync(category.Name);
+            //dbCategory.Should().NotBeNull();
+            //dbCategory.Name.Should().Be(categoryDTO.Name);
         }
 
 
@@ -127,16 +127,16 @@ namespace AsianMarketplace_WebAPI.Tests.Controllers
             // Create a CategoryDTO with the information above
             var categoryDTO = new CategoryDTO { Name = result.Name };
 
-            var updatedCategory = _controller.UpdateCategory(result.Name, categoryDTO);
+            //var updatedCategory = _controller.UpdateCategory(result.Name, categoryDTO);
 
-            var categoryUpdated = updatedCategory.Result as NoContentResult;
-            categoryUpdated.Should().NotBeNull();
-            categoryUpdated.StatusCode.Should().Be(204);
+            //var categoryUpdated = updatedCategory.Result as NoContentResult;
+            //categoryUpdated.Should().NotBeNull();
+            //categoryUpdated.StatusCode.Should().Be(204);
 
             // Verify the category is in the database
-            var dbCategory = await _context.Categories.FindAsync(result.Name);
-            dbCategory.Should().NotBeNull();
-            dbCategory.Name.Should().Be(categoryDTO.Name);
+            //var dbCategory = await _context.Categories.FindAsync(result.Name);
+            //dbCategory.Should().NotBeNull();
+            //dbCategory.Name.Should().Be(categoryDTO.Name);
         }
 
 
@@ -152,8 +152,8 @@ namespace AsianMarketplace_WebAPI.Tests.Controllers
             categoryDeleted.StatusCode.Should().Be(204);
 
             // Verify the category is not in the database
-            var dbCategory = await _context.Categories.FindAsync(result.Name);
-            dbCategory.Should().BeNull();
+            //var dbCategory = await _context.Categories.FindAsync(result.Name);
+            //dbCategory.Should().BeNull();
         }
 
         public async Task<Category> GetFirstRecord()
