@@ -40,6 +40,10 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<ICartItemRepo, CartItemRepository>();
 builder.Services.AddScoped<ICategoryRepo, CategoryRepository>();
+builder.Services.AddScoped<IItemRepo, ItemRepository>();
+builder.Services.AddScoped<IOrderRepo, OrderRepository>();
+builder.Services.AddScoped<IOrderItemRepo, OrderItemRepository>();
+builder.Services.AddScoped<IShopperRepo, ShopperRepository>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

@@ -11,7 +11,7 @@ namespace AsianMarketplace_WebAPI.Models
         }
 
         public string Title { get; set; } = null!;
-        public char IsActive { get; set; }
+        public string IsActive { get; set; } = null!;
         public DateTime DateCreated { get; set; }
         public string UserId { get; set; } = null!;
 

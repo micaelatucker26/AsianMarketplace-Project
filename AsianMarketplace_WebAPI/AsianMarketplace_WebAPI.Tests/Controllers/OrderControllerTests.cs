@@ -23,14 +23,14 @@ namespace AsianMarketplace_WebAPI.Tests.Controllers
         private readonly Mock<IMapper> _mockMapper;
         private readonly OrderController _controller;
 
-        public OrderControllerTests(OrderControllerTestsFixture fixture)
-        {
-            _context = fixture.Context;
-            // Mock the AutoMapper mapper to use when mapping my entities to DTOs
-            _mockMapper = fixture.MockMapper;
-            // Using my controller, have it use the mocked context and mocked mapper
-            _controller = new OrderController(_context, _mockMapper.Object);
-        }
+        //public OrderControllerTests(OrderControllerTestsFixture fixture)
+        //{
+        //    _context = fixture.Context;
+        //    // Mock the AutoMapper mapper to use when mapping my entities to DTOs
+        //    _mockMapper = fixture.MockMapper;
+        //    // Using my controller, have it use the mocked context and mocked mapper
+        //    _controller = new OrderController(_context, _mockMapper.Object);
+        //}
 
         [Fact]
         public async Task CreateOrder_ShouldReturnCreatedAtAction()

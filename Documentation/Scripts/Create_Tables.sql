@@ -6,7 +6,8 @@ use AsianMarketplaceDb;
 -- Create a table named Category to hold the main category names for groups of various goods/products
 -- in the marketplace. A category can have one or many subcategories.
 create table Category (
-	Name varchar(25) primary key
+	CategoryID int primary key,
+	Name varchar(25) not null
 );
 
 
@@ -27,7 +28,8 @@ create table SubCategory (
 -- lists. A shopper can also add zero or more items to their cart. Note: The password and salt 
 -- are combined and that value is hashed and stored in the Password field.
 create table Shopper (
-	Username varchar(25) primary key,
+	UserID int primary key,
+	Username varchar(25) not null,
 	Password varchar(255) not null
 );
 
@@ -42,6 +44,8 @@ create table [Order] (
 	Username varchar(25) not null,
     constraint Shopper_FK foreign key (Username) 
 		references Shopper(Username)
+			on delete cascade
+			on update cascade
 );
 
 
@@ -96,6 +100,7 @@ create table ShoppingList (
 	 constraint ShoppingList_UserID_FK foreign key (UserID) 
 		references Shopper(Username)
 			on delete cascade
+			on update cascade
 );
 
 
@@ -134,4 +139,5 @@ create table CartItem (
 	constraint CartItem_UserID_FK foreign key (UserID) 
 		references Shopper(Username)
 			on delete cascade
+			on update cascade
 );

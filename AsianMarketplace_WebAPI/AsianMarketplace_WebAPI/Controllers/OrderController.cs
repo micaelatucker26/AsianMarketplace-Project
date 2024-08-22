@@ -1,4 +1,5 @@
 ﻿using AsianMarketplace_WebAPI.DTOs;
+using AsianMarketplace_WebAPI.Interfaces;
 using AsianMarketplace_WebAPI.Models;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
@@ -10,13 +11,13 @@ namespace AsianMarketplace_WebAPI.Controllers
     [Route("api/[controller]")]
     public class OrderController : Controller
     {
-        private readonly AsianMarketplaceDbContext _marketplaceDbContext;
         private readonly IMapper _mapper;
+        private readonly IOrderRepo _orderRepo;
 
-        public OrderController(AsianMarketplaceDbContext marketplaceDbContext, IMapper mapper)
+        public OrderController(IMapper mapper, IOrderRepo orderRepo)
         {
-            _marketplaceDbContext = marketplaceDbContext;
             _mapper = mapper;
+            _orderRepo = orderRepo;
         }
 
         [HttpPost]
@@ -27,11 +28,13 @@ namespace AsianMarketplace_WebAPI.Controllers
                 // Map the DTO to the entity
                 var newOrder = _mapper.Map<Order>(orderDTO);
 
+                // Validate the orderDTO.....
+                if(orderDTO.Username == null)
+                {
+                    return StatusCode(StatusCodes.Status400BadRequest, new { Message = "The order requires a username associated with the order." });
+                }
                 // Add the new order to the context
-                _marketplaceDbContext.Orders.Add(newOrder);
-
-                // Save changes to the database
-                await _marketplaceDbContext.SaveChangesAsync();
+                await _orderRepo.CreateOrder(newOrder);
 
                 // Return that order's details (including orderId, orderdate, and username)
                 return
@@ -56,10 +59,7 @@ namespace AsianMarketplace_WebAPI.Controllers
             try
             {
                 // Gather orders into a list
-                var orders = await _marketplaceDbContext.Orders
-                //.Include(o => o.Shopper)
-                .Include(o => o.OrderItems)
-                .ToListAsync();
+                var orders = await _orderRepo.GetOrders();
                 if(orders == null)
                 {
                     return NotFound();
@@ -79,9 +79,7 @@ namespace AsianMarketplace_WebAPI.Controllers
         public async Task<ActionResult<OrderDTO>> GetOrder(Guid orderId)
         {
             // Fetch the existing order from the database
-            var order = await _marketplaceDbContext.Orders
-                .Include(o => o.OrderItems)
-                .FirstOrDefaultAsync(o => o.OrderId == orderId);
+            var order = await _orderRepo.GetOrder(orderId);
             if (order == null)
             {
                 return NotFound();
@@ -102,22 +100,19 @@ namespace AsianMarketplace_WebAPI.Controllers
         [HttpPut("{orderId}")]
         public async Task<IActionResult> UpdateOrder( Guid orderId, [FromBody] OrderDTO orderDTO)
         {
-            // Fetch the existing order from the database
-            var order =  await _marketplaceDbContext.Orders.FindAsync(orderId);
-            if (order == null)
-            {
-                return NotFound();
-            }
-
             try
             {
-                orderDTO.OrderId = orderId;
-                // The order date and username will be updated
-                order.OrderDate = orderDTO.OrderDate;
-                order.Username = orderDTO.Username;
-
-                // Save changes to the database
-                await _marketplaceDbContext.SaveChangesAsync();
+                // Validate the orderDTO.....
+                if (orderDTO.Username == null)
+                {
+                    return StatusCode(StatusCodes.Status400BadRequest, new { Message = "The order requires a username associated with the order." });
+                }
+                // Fetch the existing order from the database
+                var order =  await _orderRepo.UpdateOrder(orderId, orderDTO);
+                if (order == null)
+                {
+                    return NotFound();
+                }
 
                 // Return a response
                 return NoContent();
@@ -132,20 +127,14 @@ namespace AsianMarketplace_WebAPI.Controllers
         [HttpDelete("{orderId}")]
         public async Task<IActionResult> DeleteOrder(Guid orderId)
         {
-            // Fetch the existing order from the database
-            var order = await _marketplaceDbContext.Orders.FindAsync(orderId);
-            if (order == null)
-            {
-                return NotFound();
-            }
             try
             {
-                // Remove that order from the database
-                _marketplaceDbContext.Orders.Remove(order);
-
-                // Save changes to the database
-                await _marketplaceDbContext.SaveChangesAsync();
-
+                // Fetch the existing order from the database
+                var order = await _orderRepo.DeleteOrder(orderId);
+                if (order == null)
+                {
+                    return NotFound();
+                }
                 return NoContent();
             }
             catch (Exception ex)
