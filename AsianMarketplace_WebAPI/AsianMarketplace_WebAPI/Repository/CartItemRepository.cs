@@ -22,7 +22,7 @@ namespace AsianMarketplace_WebAPI.Repository
 
         public async Task<CartItem> DeleteCartItem(Guid itemId, string userId)
         {
-           var cartItem = await _marketplaceDbContext.CartItems.FindAsync(itemId, userId);
+            var cartItem = await _marketplaceDbContext.CartItems.FindAsync(itemId, userId);
             if (cartItem == null)
             {
                 return null;
@@ -41,7 +41,6 @@ namespace AsianMarketplace_WebAPI.Repository
                 return null;
             }
             return cartItem;
-
         }
 
         public async Task<List<CartItem>> GetCartItems()

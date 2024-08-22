@@ -12,6 +12,8 @@ namespace AsianMarketplace_WebAPI.Models
 
         public string Name { get; set; } = null!;
         public string CategoryName { get; set; } = null!;
+
+        public virtual Category CategoryNameNavigation { get; set; } = null!;
         public virtual ICollection<Item> Items { get; set; }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using AsianMarketplace_WebAPI.DTOs;
+using AsianMarketplace_WebAPI.Interfaces;
 using AsianMarketplace_WebAPI.Models;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
@@ -11,14 +12,14 @@ namespace AsianMarketplace_WebAPI.Controllers
     [Route("api/[controller]")]
     public class ShopperController : Controller
     {
-        private readonly AsianMarketplaceDbContext _marketplaceDbContext;
         private readonly IMapper _mapper;
+        private readonly IShopperRepo _shopperRepo;
         private readonly PasswordHasher<IdentityUser> passwordHasher;
 
-        public ShopperController(AsianMarketplaceDbContext marketplaceDbContext, IMapper mapper)
+        public ShopperController(IMapper mapper, IShopperRepo shopperRepo)
         {
-            _marketplaceDbContext = marketplaceDbContext;
             _mapper = mapper;
+            _shopperRepo = shopperRepo;
         }
 
         [HttpPost]
@@ -42,10 +43,7 @@ namespace AsianMarketplace_WebAPI.Controllers
                 newUser.Password = hashedPassword;
 
                 // Add the new shopper to the context
-                _marketplaceDbContext.Shoppers.Add(newUser);
-
-                // Save changes to the database
-                await _marketplaceDbContext.SaveChangesAsync();
+                await _shopperRepo.CreateShopper(newUser);
 
                 // Return a success message for successful creation of shopper/user
                 return
@@ -81,7 +79,7 @@ namespace AsianMarketplace_WebAPI.Controllers
             try
             {
                 // Gather shoppers into a list
-                var users = await _marketplaceDbContext.Shoppers.ToListAsync();
+                var users = await _shopperRepo.GetShoppers();
                 if(users == null)
                 {
                     return NotFound();
@@ -101,8 +99,7 @@ namespace AsianMarketplace_WebAPI.Controllers
         public async Task<ActionResult<ShopperDTO>> GetShopper(string username)
         {
             // Fetch the existing shopper from the database
-            var shopper = await _marketplaceDbContext.Shoppers
-                .FirstOrDefaultAsync(s => s.Username == username);
+            var shopper = await _shopperRepo.GetShopper(username);
             if (shopper == null)
             {
                 return NotFound();
@@ -120,60 +117,53 @@ namespace AsianMarketplace_WebAPI.Controllers
             }
         }
 
-        [HttpPut("{username}")]
-        public async Task<IActionResult> UpdateShopper(string username, [FromBody] ShopperDTO shopperDTO)
-        {
-            // Fetch the existing user from the database
-            var user =  await _marketplaceDbContext.Shoppers.FindAsync(username);
-            if (user == null)
-            {
-                return NotFound();
-            }
+        //[HttpPut("{username}")]
+        //public async Task<IActionResult> UpdateShopper(string username, [FromBody] ShopperDTO shopperDTO)
+        //{
+        //    try
+        //    {
+        //        // Fetch the existing user from the database
+        //        var user = await _shopperRepo.GetShopper(username);
+        //        if (user == null)
+        //        {
+        //            return NotFound();
+        //        }
 
-            if (!string.IsNullOrEmpty(shopperDTO.Password))
-            {
-                var shopper = new IdentityUser { UserName = user.Username };
-                var passwordHasher = new PasswordHasher<IdentityUser>();
-                // Hash the new password
-                string hashedPassword = passwordHasher.HashPassword(shopper, shopperDTO.Password);
-                // Assign the hashed password to the new shopper
-                user.Password = hashedPassword;
-            }
-            try
-            {
-                // Update the context with the new user information
-                _marketplaceDbContext.Shoppers.Update(user);
-
-                // Save changes to the database
-                await _marketplaceDbContext.SaveChangesAsync();
-
-                // Return a response
-                return NoContent();
-            }
-            catch (Exception ex)
-            {
-                // Handle other exceptions
-                return StatusCode(StatusCodes.Status500InternalServerError, new { Message = "An unexpected error occurred.", Details = ex.Message });
-            }
-        }
+        //        if (!string.IsNullOrEmpty(shopperDTO.Password))
+        //        {
+        //            var shopper = new IdentityUser { UserName = user.Username };
+        //            var passwordHasher = new PasswordHasher<IdentityUser>();
+        //            // Hash the new password
+        //            string hashedPassword = passwordHasher.HashPassword(shopper, shopperDTO.Password);
+        //            // Assign the hashed password to the new shopper
+        //            user.Password = hashedPassword;
+        //        }
+     
+    
+        //        // Update the context with the new user information
+        //        await _shopperRepo.UpdateShopper(username, shopperDTO);
+        //        //_marketplaceDbContext.Shoppers.Update(user);
+        //        // Return a response
+        //        return NoContent();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        // Handle other exceptions
+        //        return StatusCode(StatusCodes.Status500InternalServerError, new { Message = "An unexpected error occurred.", Details = ex.Message });
+        //    }
+        //}
 
         [HttpDelete("{username}")]
         public async Task<IActionResult> DeleteShopper(string username)
         {
-            // Fetch the existing user from the database
-            var shopper = await _marketplaceDbContext.Shoppers.FindAsync(username);
-            if (shopper == null)
-            {
-                return NotFound();
-            }
             try
             {
-                // Remove that shopper from the database
-                _marketplaceDbContext.Shoppers.Remove(shopper);
-
-                // Save changes to the database
-                await _marketplaceDbContext.SaveChangesAsync();
-
+                // Try to delete the shopper from the database
+                var shopper = await _shopperRepo.DeleteShopper(username);
+                if (shopper == null)
+                {
+                    return NotFound();
+                }
                 return NoContent();
             }
             catch (Exception ex)

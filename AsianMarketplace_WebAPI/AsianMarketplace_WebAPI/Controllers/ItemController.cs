@@ -1,4 +1,5 @@
 ﻿using AsianMarketplace_WebAPI.DTOs;
+using AsianMarketplace_WebAPI.Interfaces;
 using AsianMarketplace_WebAPI.Models;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
@@ -10,13 +11,13 @@ namespace AsianMarketplace_WebAPI.Controllers
     [Route("api/[controller]")]
     public class ItemController : Controller
     {
-        private readonly AsianMarketplaceDbContext _marketplaceDbContext;
         private readonly IMapper _mapper;
+        private readonly IItemRepo _itemRepo;
 
-        public ItemController(AsianMarketplaceDbContext marketplaceDbContext, IMapper mapper)
+        public ItemController(IMapper mapper, IItemRepo itemRepo)
         {
-            _marketplaceDbContext = marketplaceDbContext;
             _mapper = mapper;
+            _itemRepo = itemRepo;
         }
 
         [HttpPost]
@@ -27,11 +28,22 @@ namespace AsianMarketplace_WebAPI.Controllers
                 // Map the DTO to the entity
                 var newItem = _mapper.Map<Item>(itemDTO);
 
-                // Add the new item to the context
-                _marketplaceDbContext.Items.Add(newItem);
+                // Validate the itemDTO.....
+                if(itemDTO.Quantity < 0)
+                {
+                    return StatusCode(StatusCodes.Status400BadRequest, new { Message = "The item quantity must be greater than or equal to zero." });
+                }
+                else if(itemDTO.Price < 0)
+                {
+                    return StatusCode(StatusCodes.Status400BadRequest, new { Message = "The item price must be greater than or equal to zero." });
+                }
+                else if(itemDTO.ImageUrl == "")
+                {
+                    return StatusCode(StatusCodes.Status400BadRequest, new { Message = "The item must have an Image URL." });
+                }
 
-                // Save changes to the database
-                await _marketplaceDbContext.SaveChangesAsync();
+                // Add the new item to the context
+                await _itemRepo.CreateItem(newItem);
 
                 // Return that item's details (including itemId, name, description, quantity, price, imageURL, and subcategory name)
                 return
@@ -56,12 +68,7 @@ namespace AsianMarketplace_WebAPI.Controllers
             try
             {
                 // Gather items into a list
-                var items = await _marketplaceDbContext.Items
-                .OrderBy(i => i.Name)
-                .Include(i => i.CartItems)
-                .Include(i => i.OrderItems)
-                .Include(i => i.ShoppingListItems)
-                .ToListAsync();
+                var items = await _itemRepo.GetItems();
                 if(items == null)
                 {
                     return NotFound();
@@ -81,16 +88,11 @@ namespace AsianMarketplace_WebAPI.Controllers
         public async Task<ActionResult<ItemDTO>> GetItem(Guid itemId)
         {
             // Fetch the existing item from the database
-            var item = await _marketplaceDbContext.Items
-                .Include(i => i.CartItems)
-                .Include(i => i.OrderItems)
-                .Include(i => i.ShoppingListItems)
-                .FirstOrDefaultAsync(i => i.ItemId == itemId);
+            var item = await _itemRepo.GetItem(itemId);
             if (item == null)
             {
                 return NotFound();
             }
-
             try
             {
                 // Map that item to the DTO
@@ -107,28 +109,27 @@ namespace AsianMarketplace_WebAPI.Controllers
         [HttpPut("{itemId}")]
         public async Task<IActionResult> UpdateItem( Guid itemId, [FromBody] ItemDTO itemDTO)
         {
-            // Fetch the existing item from the database
-            var item =  await _marketplaceDbContext.Items.FindAsync(itemId);
-            if (item == null)
-            {
-                return NotFound();
-            }
-
             try
             {
-                itemDTO.ItemId = itemId;
-
-                // All of these fields below will be updated
-                item.Name = itemDTO.Name;
-                item.Description = itemDTO.Description;
-                item.Quantity = itemDTO.Quantity;
-                item.Price = itemDTO.Price;
-                item.ImageUrl = itemDTO.ImageUrl;
-                item.SubCategoryName = itemDTO.SubCategoryName;
-
-                // Save changes to the database
-                await _marketplaceDbContext.SaveChangesAsync();
-
+                // Validate the itemDTO.....
+                if (itemDTO.Quantity < 0)
+                {
+                    return StatusCode(StatusCodes.Status400BadRequest, new { Message = "The item quantity must be greater than or equal to zero." });
+                }
+                else if (itemDTO.Price < 0)
+                {
+                    return StatusCode(StatusCodes.Status400BadRequest, new { Message = "The item price must be greater than or equal to zero." });
+                }
+                else if (itemDTO.ImageUrl == null)
+                {
+                    return StatusCode(StatusCodes.Status400BadRequest, new { Message = "The item must have an Image URL." });
+                }
+                // Fetch the existing item from the database
+                var item = await _itemRepo.UpdateItem(itemId, itemDTO);
+                if (item == null)
+                {
+                    return NotFound();
+                }
                 // Return a response
                 return NoContent();
             }
@@ -142,20 +143,14 @@ namespace AsianMarketplace_WebAPI.Controllers
         [HttpDelete("{itemId}")]
         public async Task<IActionResult> DeleteItem(Guid itemId)
         {
-            // Fetch the existing item from the database
-            var item = await _marketplaceDbContext.Items.FindAsync(itemId);
-            if (item == null)
-            {
-                return NotFound();
-            }
             try
             {
-                // Remove that item from the database
-                _marketplaceDbContext.Items.Remove(item);
-
-                // Save changes to the database
-                await _marketplaceDbContext.SaveChangesAsync();
-
+                // Fetch the existing item from the database
+                var item = await _itemRepo.DeleteItem(itemId);
+                if (item == null)
+                {
+                    return NotFound();
+                }
                 return NoContent();
             }
             catch (Exception ex)

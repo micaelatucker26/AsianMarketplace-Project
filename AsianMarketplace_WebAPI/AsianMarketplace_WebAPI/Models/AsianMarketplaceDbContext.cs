@@ -58,15 +58,19 @@ namespace AsianMarketplace_WebAPI.Models
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.CartItems)
+                    .HasPrincipalKey(p => p.Username)
                     .HasForeignKey(d => d.UserId)
                     .HasConstraintName("CartItem_UserID_FK");
             });
 
             modelBuilder.Entity<Category>(entity =>
             {
-                entity.HasKey(e => e.CategoryID);
-
                 entity.ToTable("Category");
+
+                entity.HasIndex(e => e.Name, "UC_Category_Name")
+                    .IsUnique();
+
+                entity.Property(e => e.CategoryId).HasColumnName("CategoryID");
 
                 entity.Property(e => e.Name)
                     .HasMaxLength(25)
@@ -123,8 +127,8 @@ namespace AsianMarketplace_WebAPI.Models
 
                 entity.HasOne(d => d.UsernameNavigation)
                     .WithMany(p => p.Orders)
+                    .HasPrincipalKey(p => p.Username)
                     .HasForeignKey(d => d.Username)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("Shopper_FK");
             });
 
@@ -154,17 +158,22 @@ namespace AsianMarketplace_WebAPI.Models
 
             modelBuilder.Entity<Shopper>(entity =>
             {
-                entity.HasKey(e => e.Username)
-                    .HasName("PK__Shopper__536C85E55B620307");
+                entity.HasKey(e => e.UserId)
+                    .HasName("PK__Shopper__1788CCACC91DA542");
 
                 entity.ToTable("Shopper");
 
-                entity.Property(e => e.Username)
-                    .HasMaxLength(25)
-                    .IsUnicode(false);
+                entity.HasIndex(e => e.Username, "UC_Shopper_Name")
+                    .IsUnique();
+
+                entity.Property(e => e.UserId).HasColumnName("UserID");
 
                 entity.Property(e => e.Password)
                     .HasMaxLength(255)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Username)
+                    .HasMaxLength(25)
                     .IsUnicode(false);
             });
 
@@ -194,6 +203,7 @@ namespace AsianMarketplace_WebAPI.Models
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.ShoppingLists)
+                    .HasPrincipalKey(p => p.Username)
                     .HasForeignKey(d => d.UserId)
                     .HasConstraintName("ShoppingList_UserID_FK");
             });
@@ -248,10 +258,11 @@ namespace AsianMarketplace_WebAPI.Models
                     .HasMaxLength(25)
                     .IsUnicode(false);
 
-                //entity.HasOne(d => d.CategoryNameNavigation)
-                //    .WithMany(p => p.SubCategories)
-                //    .HasForeignKey(d => d.CategoryName)
-                //    .HasConstraintName("Category_FK");
+                entity.HasOne(d => d.CategoryNameNavigation)
+                    .WithMany(p => p.SubCategories)
+                    .HasPrincipalKey(p => p.Name)
+                    .HasForeignKey(d => d.CategoryName)
+                    .HasConstraintName("Category_FK");
             });
 
             OnModelCreatingPartial(modelBuilder);

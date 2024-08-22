@@ -1,12 +1,93 @@
 {
   "Version": 1,
   "WorkspaceRootPath": "C:\\Users\\micae\\Documents\\Asian Marketplace\\Asian-Marketplace-Project\\AsianMarketplace_WebAPI\\",
-  "Documents": [],
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{21EECF66-C6FF-4EE1-AA33-8E5A9CCE6D21}|AsianMarketplace_WebAPI\\AsianMarketplace_WebAPI.csproj|c:\\users\\micae\\documents\\asian marketplace\\asian-marketplace-project\\asianmarketplace_webapi\\asianmarketplace_webapi\\controllers\\shoppercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{21EECF66-C6FF-4EE1-AA33-8E5A9CCE6D21}|AsianMarketplace_WebAPI\\AsianMarketplace_WebAPI.csproj|solutionrelative:asianmarketplace_webapi\\controllers\\shoppercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{21EECF66-C6FF-4EE1-AA33-8E5A9CCE6D21}|AsianMarketplace_WebAPI\\AsianMarketplace_WebAPI.csproj|c:\\users\\micae\\documents\\asian marketplace\\asian-marketplace-project\\asianmarketplace_webapi\\asianmarketplace_webapi\\repository\\shopperrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{21EECF66-C6FF-4EE1-AA33-8E5A9CCE6D21}|AsianMarketplace_WebAPI\\AsianMarketplace_WebAPI.csproj|solutionrelative:asianmarketplace_webapi\\repository\\shopperrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{21EECF66-C6FF-4EE1-AA33-8E5A9CCE6D21}|AsianMarketplace_WebAPI\\AsianMarketplace_WebAPI.csproj|c:\\users\\micae\\documents\\asian marketplace\\asian-marketplace-project\\asianmarketplace_webapi\\asianmarketplace_webapi\\dtos\\shopperdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{21EECF66-C6FF-4EE1-AA33-8E5A9CCE6D21}|AsianMarketplace_WebAPI\\AsianMarketplace_WebAPI.csproj|solutionrelative:asianmarketplace_webapi\\dtos\\shopperdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
       "VerticalTabListWidth": 256,
-      "DocumentGroups": []
+      "DocumentGroups": [
+        {
+          "DockedWidth": 223,
+          "SelectedChildIndex": 5,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:129:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:130:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:128:0:{75188d03-9892-4ae2-abf1-207126247ce5}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "ShopperRepository.cs",
+              "DocumentMoniker": "C:\\Users\\micae\\Documents\\Asian Marketplace\\Asian-Marketplace-Project\\AsianMarketplace_WebAPI\\AsianMarketplace_WebAPI\\Repository\\ShopperRepository.cs",
+              "RelativeDocumentMoniker": "AsianMarketplace_WebAPI\\Repository\\ShopperRepository.cs",
+              "ToolTip": "C:\\Users\\micae\\Documents\\Asian Marketplace\\Asian-Marketplace-Project\\AsianMarketplace_WebAPI\\AsianMarketplace_WebAPI\\Repository\\ShopperRepository.cs",
+              "RelativeToolTip": "AsianMarketplace_WebAPI\\Repository\\ShopperRepository.cs",
+              "ViewState": "AgIAAEMAAAAAAAAAAAAAwEUAAAA5AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-22T18:37:28.568Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "ShopperDTO.cs",
+              "DocumentMoniker": "C:\\Users\\micae\\Documents\\Asian Marketplace\\Asian-Marketplace-Project\\AsianMarketplace_WebAPI\\AsianMarketplace_WebAPI\\DTOs\\ShopperDTO.cs",
+              "RelativeDocumentMoniker": "AsianMarketplace_WebAPI\\DTOs\\ShopperDTO.cs",
+              "ToolTip": "C:\\Users\\micae\\Documents\\Asian Marketplace\\Asian-Marketplace-Project\\AsianMarketplace_WebAPI\\AsianMarketplace_WebAPI\\DTOs\\ShopperDTO.cs",
+              "RelativeToolTip": "AsianMarketplace_WebAPI\\DTOs\\ShopperDTO.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-22T18:23:38.441Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "ShopperController.cs",
+              "DocumentMoniker": "C:\\Users\\micae\\Documents\\Asian Marketplace\\Asian-Marketplace-Project\\AsianMarketplace_WebAPI\\AsianMarketplace_WebAPI\\Controllers\\ShopperController.cs",
+              "RelativeDocumentMoniker": "AsianMarketplace_WebAPI\\Controllers\\ShopperController.cs",
+              "ToolTip": "C:\\Users\\micae\\Documents\\Asian Marketplace\\Asian-Marketplace-Project\\AsianMarketplace_WebAPI\\AsianMarketplace_WebAPI\\Controllers\\ShopperController.cs",
+              "RelativeToolTip": "AsianMarketplace_WebAPI\\Controllers\\ShopperController.cs",
+              "ViewState": "AgIAAIsAAAAAAAAAAAAwwJkAAAALAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-22T18:23:28.933Z",
+              "EditorCaption": ""
+            }
+          ]
+        },
+        {
+          "DockedWidth": 193,
+          "SelectedChildIndex": -1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:128:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            }
+          ]
+        }
+      ]
     }
   ]
 }

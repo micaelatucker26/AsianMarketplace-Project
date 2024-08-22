@@ -36,7 +36,6 @@ namespace AsianMarketplace_WebAPI.Repository
             // Save changes to the database
             await _marketplaceDbContext.SaveChangesAsync();
             return category;
-
         }
 
         public async Task<List<Category>> GetCategories()

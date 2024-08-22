@@ -1,4 +1,5 @@
 ﻿using AsianMarketplace_WebAPI.DTOs;
+using AsianMarketplace_WebAPI.Interfaces;
 using AsianMarketplace_WebAPI.Models;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
@@ -10,13 +11,13 @@ namespace AsianMarketplace_WebAPI.Controllers
     [Route("api/[controller]")]
     public class OrderItemController : Controller
     {
-        private readonly AsianMarketplaceDbContext _marketplaceDbContext;
         private readonly IMapper _mapper;
+        private readonly IOrderItemRepo _orderItemRepo;
 
-        public OrderItemController(AsianMarketplaceDbContext marketplaceDbContext, IMapper mapper)
+        public OrderItemController(IMapper mapper, IOrderItemRepo orderItemRepo)
         {
-            _marketplaceDbContext = marketplaceDbContext;
             _mapper = mapper;
+            _orderItemRepo = orderItemRepo;
         }
 
         [HttpPost]
@@ -27,11 +28,17 @@ namespace AsianMarketplace_WebAPI.Controllers
                 // Map the DTO to the entity
                 var newOrderItem = _mapper.Map<OrderItem>(orderItemDTO);
 
+                //Validate the orderItemDTO.....
+                if(orderItemDTO.Price < 0)
+                {
+                    return StatusCode(StatusCodes.Status400BadRequest, new { Message = "Order item Price must be greater than or equal to zero." });
+                }
+                else if(orderItemDTO.Quantity < 1)
+                {
+                    return StatusCode(StatusCodes.Status400BadRequest, new { Message = "Order item Quantity must be greater than or equal to one." });
+                }
                 // Add the new order item to the context
-                _marketplaceDbContext.OrderItems.Add(newOrderItem);
-
-                // Save changes to the database
-                await _marketplaceDbContext.SaveChangesAsync();
+                await _orderItemRepo.CreateOrderItem(newOrderItem);
 
                 // Return that order item's details (including price, quantity, itemId, and orderId)
                 return
@@ -56,8 +63,7 @@ namespace AsianMarketplace_WebAPI.Controllers
             try
             {
                 // Gather order items into a list
-                var orderItems = await _marketplaceDbContext.OrderItems
-                .ToListAsync();
+                var orderItems = await _orderItemRepo.GetOrderItems();
                 if(orderItems == null)
                 {
                     return NotFound();
@@ -77,8 +83,7 @@ namespace AsianMarketplace_WebAPI.Controllers
         public async Task<ActionResult<OrderItemDTO>> GetOrderItem( Guid itemId, Guid orderId)
         {
             // Fetch the existing order item from the database
-            var orderItem = await _marketplaceDbContext.OrderItems
-                .FirstOrDefaultAsync(oi => oi.ItemId == itemId && oi.OrderId == orderId);
+            var orderItem = await _orderItemRepo.GetOrderItem(itemId, orderId);
             if (orderItem == null)
             {
                 return NotFound();
@@ -99,23 +104,23 @@ namespace AsianMarketplace_WebAPI.Controllers
         [HttpPut("{itemId}/{orderId}")]
         public async Task<IActionResult> UpdateOrderItem( Guid itemId, Guid orderId, [FromBody] OrderItemDTO orderItemDTO)
         {
-            // Fetch the existing order item from the database
-            var orderItem =  await _marketplaceDbContext.OrderItems.FindAsync(itemId, orderId);
-            if (orderItem == null)
-            {
-                return NotFound();
-            }
-
             try
             {
-                // The price and the quantity will be updated
-                orderItem.Price = orderItemDTO.Price;
-                orderItem.Quantity = orderItemDTO.Quantity;
-                orderItemDTO.ItemId = itemId;
-                orderItemDTO.OrderId = orderId;
-
-                // Save changes to the database
-                await _marketplaceDbContext.SaveChangesAsync();
+                //Validate the orderItemDTO.....
+                if (orderItemDTO.Price < 0)
+                {
+                    return StatusCode(StatusCodes.Status400BadRequest, new { Message = "Order item Price must be greater than or equal to zero." });
+                }
+                else if (orderItemDTO.Quantity < 1)
+                {
+                    return StatusCode(StatusCodes.Status400BadRequest, new { Message = "Order item Quantity must be greater than or equal to one." });
+                }
+                // Fetch the existing order item from the database
+                var orderItem = await _orderItemRepo.UpdateOrderItem(itemId, orderId, orderItemDTO);
+                if (orderItem == null)
+                {
+                    return NotFound();
+                }
 
                 // Return a response
                 return NoContent();
@@ -130,20 +135,14 @@ namespace AsianMarketplace_WebAPI.Controllers
         [HttpDelete("{itemId}/{orderId}")]
         public async Task<IActionResult> DeleteOrderItem(Guid itemId, Guid orderId)
         {
-            // Fetch the existing order item from the database
-            var orderItem = await _marketplaceDbContext.OrderItems.FindAsync(itemId, orderId);
-            if (orderItem == null)
-            {
-                return NotFound();
-            }
             try
             {
-                // Remove that order item from the database
-                _marketplaceDbContext.OrderItems.Remove(orderItem);
-
-                // Save changes to the database
-                await _marketplaceDbContext.SaveChangesAsync();
-
+                // Try to delete the order item from the database
+                var orderItem = await _orderItemRepo.DeleteOrderItem(itemId, orderId);
+                if (orderItem == null)
+                {
+                    return NotFound();
+                }
                 return NoContent();
             }
             catch (Exception ex)
