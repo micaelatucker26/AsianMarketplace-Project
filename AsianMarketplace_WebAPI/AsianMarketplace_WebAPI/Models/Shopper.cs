@@ -12,9 +12,9 @@ namespace AsianMarketplace_WebAPI.Models
             ShoppingLists = new HashSet<ShoppingList>();
         }
 
+        public Guid UserId { get; set; }
         public string Username { get; set; } = null!;
         public string Password { get; set; } = null!;
-        public int UserId { get; set; }
 
         public virtual ICollection<CartItem> CartItems { get; set; }
         public virtual ICollection<Order> Orders { get; set; }

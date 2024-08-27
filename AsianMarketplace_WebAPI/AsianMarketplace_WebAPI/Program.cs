@@ -1,4 +1,5 @@
 using AsianMarketplace_WebAPI.DTOs;
+using AsianMarketplace_WebAPI.DTOs.Responses;
 using AsianMarketplace_WebAPI.Interfaces;
 using AsianMarketplace_WebAPI.Models;
 using AsianMarketplace_WebAPI.Repository;
@@ -12,7 +13,8 @@ var builder = WebApplication.CreateBuilder(args);
 // Register AutoMapper
 var config = new MapperConfiguration(cfg => 
     { 
-        cfg.CreateMap<CartItem, CartItemDTO>().ReverseMap(); 
+        cfg.CreateMap<CartItem, CartItemDTO>().ReverseMap();
+        cfg.CreateMap<CartItem, CartItemResponseDTO>().ReverseMap();
         cfg.CreateMap<Category, CategoryDTO>().ReverseMap();
         cfg.CreateMap<Item, ItemDTO>().ReverseMap();
         cfg.CreateMap<Order, OrderDTO>().ReverseMap();
@@ -44,6 +46,8 @@ builder.Services.AddScoped<IItemRepo, ItemRepository>();
 builder.Services.AddScoped<IOrderRepo, OrderRepository>();
 builder.Services.AddScoped<IOrderItemRepo, OrderItemRepository>();
 builder.Services.AddScoped<IShopperRepo, ShopperRepository>();
+builder.Services.AddScoped<IShoppingListRepo, ShoppingListRepository>();
+builder.Services.AddScoped<ISubCategoryRepo, SubCategoryRepository>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

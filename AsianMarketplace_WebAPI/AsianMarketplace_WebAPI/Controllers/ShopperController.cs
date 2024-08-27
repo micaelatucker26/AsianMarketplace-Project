@@ -117,41 +117,41 @@ namespace AsianMarketplace_WebAPI.Controllers
             }
         }
 
-        //[HttpPut("{username}")]
-        //public async Task<IActionResult> UpdateShopper(string username, [FromBody] ShopperDTO shopperDTO)
-        //{
-        //    try
-        //    {
-        //        // Fetch the existing user from the database
-        //        var user = await _shopperRepo.GetShopper(username);
-        //        if (user == null)
-        //        {
-        //            return NotFound();
-        //        }
+        [HttpPut("{username}")]
+        public async Task<IActionResult> UpdateShopper(string username, [FromBody] ShopperDTO shopperDTO)
+        {
+            try
+            {
+                // Fetch the existing user from the database
+                var user = await _shopperRepo.GetShopper(username);
+                if (user == null)
+                {
+                    return NotFound();
+                }
 
-        //        if (!string.IsNullOrEmpty(shopperDTO.Password))
-        //        {
-        //            var shopper = new IdentityUser { UserName = user.Username };
-        //            var passwordHasher = new PasswordHasher<IdentityUser>();
-        //            // Hash the new password
-        //            string hashedPassword = passwordHasher.HashPassword(shopper, shopperDTO.Password);
-        //            // Assign the hashed password to the new shopper
-        //            user.Password = hashedPassword;
-        //        }
-     
-    
-        //        // Update the context with the new user information
-        //        await _shopperRepo.UpdateShopper(username, shopperDTO);
-        //        //_marketplaceDbContext.Shoppers.Update(user);
-        //        // Return a response
-        //        return NoContent();
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        // Handle other exceptions
-        //        return StatusCode(StatusCodes.Status500InternalServerError, new { Message = "An unexpected error occurred.", Details = ex.Message });
-        //    }
-        //}
+                if (!string.IsNullOrEmpty(shopperDTO.Password))
+                {
+                    var shopper = new IdentityUser { UserName = user.Username };
+                    var passwordHasher = new PasswordHasher<IdentityUser>();
+                    // Hash the new password
+                    string hashedPassword = passwordHasher.HashPassword(shopper, shopperDTO.Password);
+                    // Assign the hashed password to the new shopper
+                    user.Password = hashedPassword;
+                }
+
+
+                // Update the context with the new user information
+                var newUser = await _shopperRepo.UpdateShopper(username, shopperDTO);
+                //_marketplaceDbContext.Shoppers.Update(user);
+                // Return a response
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                // Handle other exceptions
+                return StatusCode(StatusCodes.Status500InternalServerError, new { Message = "An unexpected error occurred.", Details = ex.Message });
+            }
+        }
 
         [HttpDelete("{username}")]
         public async Task<IActionResult> DeleteShopper(string username)

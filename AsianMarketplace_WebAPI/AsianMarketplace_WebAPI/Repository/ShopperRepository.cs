@@ -66,11 +66,16 @@ namespace AsianMarketplace_WebAPI.Repository
             {
                 return null;
             }
+            var usernameExists = await _marketplaceDbContext.Shoppers.AnyAsync(c => c.Username == shopperDTO.Username && c.UserId != existingShopper.UserId);
+            if(usernameExists)
+            {
+                return null;
+            }
             // The shopper name will be updated
             existingShopper.Username = shopperDTO.Username;
             // Save changes to the database
             await _marketplaceDbContext.SaveChangesAsync();
             return existingShopper;
         }
-}
+    }
 }

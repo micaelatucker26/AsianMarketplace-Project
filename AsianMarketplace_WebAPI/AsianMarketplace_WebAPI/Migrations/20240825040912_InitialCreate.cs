@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace AsianMarketplace_WebAPI.Migrations
 {
-    public partial class AddPrimaryKeyToMyEntity : Migration
+    public partial class InitialCreate : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -13,25 +13,29 @@ namespace AsianMarketplace_WebAPI.Migrations
                 name: "Category",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
+                    CategoryID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "varchar(25)", unicode: false, maxLength: 25, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Category", x => x.Id);
+                    table.PrimaryKey("PK_Category", x => x.CategoryID);
+                    table.UniqueConstraint("AK_Category_Name", x => x.Name);
                 });
 
             migrationBuilder.CreateTable(
                 name: "Shopper",
                 columns: table => new
                 {
+                    UserID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     Username = table.Column<string>(type: "varchar(25)", unicode: false, maxLength: 25, nullable: false),
                     Password = table.Column<string>(type: "varchar(255)", unicode: false, maxLength: 255, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK__Shopper__536C85E55B620307", x => x.Username);
+                    table.PrimaryKey("PK__Shopper__1788CCACC91DA542", x => x.UserID);
+                    table.UniqueConstraint("AK_Shopper_Username", x => x.Username);
                 });
 
             migrationBuilder.CreateTable(
@@ -39,17 +43,17 @@ namespace AsianMarketplace_WebAPI.Migrations
                 columns: table => new
                 {
                     Name = table.Column<string>(type: "varchar(25)", unicode: false, maxLength: 25, nullable: false),
-                    CategoryName = table.Column<string>(type: "varchar(25)", unicode: false, maxLength: 25, nullable: false),
-                    CategoryId = table.Column<int>(type: "int", nullable: true)
+                    CategoryName = table.Column<string>(type: "varchar(25)", unicode: false, maxLength: 25, nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK__SubCateg__737584F73EE87B95", x => x.Name);
                     table.ForeignKey(
-                        name: "FK_SubCategory_Category_CategoryId",
-                        column: x => x.CategoryId,
+                        name: "Category_FK",
+                        column: x => x.CategoryName,
                         principalTable: "Category",
-                        principalColumn: "Id");
+                        principalColumn: "Name",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -67,7 +71,8 @@ namespace AsianMarketplace_WebAPI.Migrations
                         name: "Shopper_FK",
                         column: x => x.Username,
                         principalTable: "Shopper",
-                        principalColumn: "Username");
+                        principalColumn: "Username",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -197,6 +202,12 @@ namespace AsianMarketplace_WebAPI.Migrations
                 column: "UserID");
 
             migrationBuilder.CreateIndex(
+                name: "UC_Category_Name",
+                table: "Category",
+                column: "Name",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Item_SubCategoryName",
                 table: "Item",
                 column: "SubCategoryName");
@@ -212,6 +223,12 @@ namespace AsianMarketplace_WebAPI.Migrations
                 column: "OrderID");
 
             migrationBuilder.CreateIndex(
+                name: "UC_Shopper_Name",
+                table: "Shopper",
+                column: "Username",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ShoppingList_UserID",
                 table: "ShoppingList",
                 column: "UserID");
@@ -222,9 +239,9 @@ namespace AsianMarketplace_WebAPI.Migrations
                 column: "ItemID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_SubCategory_CategoryId",
+                name: "IX_SubCategory_CategoryName",
                 table: "SubCategory",
-                column: "CategoryId");
+                column: "CategoryName");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

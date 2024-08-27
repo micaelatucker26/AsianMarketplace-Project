@@ -66,7 +66,7 @@ namespace AsianMarketplace_WebAPI.Repository
             existingItem.Price = itemDTO.Price;
             existingItem.Quantity = itemDTO.Quantity;
             existingItem.ImageUrl = itemDTO.ImageUrl;
-            existingItem.SubCategoryName = itemDTO.SubCategoryName;
+            existingItem.SubCategory.Name = itemDTO.SubCategoryName;
 
             await _marketplaceDbContext.SaveChangesAsync();
             return existingItem;

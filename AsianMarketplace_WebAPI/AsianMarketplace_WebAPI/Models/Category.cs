@@ -10,8 +10,8 @@ namespace AsianMarketplace_WebAPI.Models
             SubCategories = new HashSet<SubCategory>();
         }
 
+        public Guid CategoryId { get; set; }
         public string Name { get; set; } = null!;
-        public int CategoryId { get; set; }
 
         public virtual ICollection<SubCategory> SubCategories { get; set; }
     }

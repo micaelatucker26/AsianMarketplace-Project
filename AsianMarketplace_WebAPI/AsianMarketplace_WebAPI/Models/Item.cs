@@ -18,9 +18,9 @@ namespace AsianMarketplace_WebAPI.Models
         public int Quantity { get; set; }
         public decimal Price { get; set; }
         public string ImageUrl { get; set; } = null!;
-        public string? SubCategoryName { get; set; }
+        public Guid SubCategoryId { get; set; }
 
-        public virtual SubCategory? SubCategoryNameNavigation { get; set; }
+        public virtual SubCategory SubCategory { get; set; } = null!;
         public virtual ICollection<CartItem> CartItems { get; set; }
         public virtual ICollection<OrderItem> OrderItems { get; set; }
         public virtual ICollection<ShoppingListItem> ShoppingListItems { get; set; }

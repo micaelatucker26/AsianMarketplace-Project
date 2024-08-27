@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AsianMarketplace_WebAPI.Migrations
 {
     [DbContext(typeof(AsianMarketplaceDbContext))]
-    [Migration("20240815234015_AddPrimaryKeyToMyEntity")]
-    partial class AddPrimaryKeyToMyEntity
+    [Migration("20240825040912_InitialCreate")]
+    partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -49,11 +49,12 @@ namespace AsianMarketplace_WebAPI.Migrations
 
             modelBuilder.Entity("AsianMarketplace_WebAPI.Models.Category", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("CategoryId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("CategoryID");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CategoryId"), 1L, 1);
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -61,7 +62,10 @@ namespace AsianMarketplace_WebAPI.Migrations
                         .IsUnicode(false)
                         .HasColumnType("varchar(25)");
 
-                    b.HasKey("Id");
+                    b.HasKey("CategoryId");
+
+                    b.HasIndex(new[] { "Name" }, "UC_Category_Name")
+                        .IsUnique();
 
                     b.ToTable("Category", (string)null);
                 });
@@ -161,10 +165,12 @@ namespace AsianMarketplace_WebAPI.Migrations
 
             modelBuilder.Entity("AsianMarketplace_WebAPI.Models.Shopper", b =>
                 {
-                    b.Property<string>("Username")
-                        .HasMaxLength(25)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(25)");
+                    b.Property<int>("UserId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("UserID");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserId"), 1L, 1);
 
                     b.Property<string>("Password")
                         .IsRequired()
@@ -172,8 +178,17 @@ namespace AsianMarketplace_WebAPI.Migrations
                         .IsUnicode(false)
                         .HasColumnType("varchar(255)");
 
-                    b.HasKey("Username")
-                        .HasName("PK__Shopper__536C85E55B620307");
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasMaxLength(25)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(25)");
+
+                    b.HasKey("UserId")
+                        .HasName("PK__Shopper__1788CCACC91DA542");
+
+                    b.HasIndex(new[] { "Username" }, "UC_Shopper_Name")
+                        .IsUnique();
 
                     b.ToTable("Shopper", (string)null);
                 });
@@ -254,9 +269,6 @@ namespace AsianMarketplace_WebAPI.Migrations
                         .IsUnicode(false)
                         .HasColumnType("varchar(25)");
 
-                    b.Property<int?>("CategoryId")
-                        .HasColumnType("int");
-
                     b.Property<string>("CategoryName")
                         .IsRequired()
                         .HasMaxLength(25)
@@ -266,7 +278,7 @@ namespace AsianMarketplace_WebAPI.Migrations
                     b.HasKey("Name")
                         .HasName("PK__SubCateg__737584F73EE87B95");
 
-                    b.HasIndex("CategoryId");
+                    b.HasIndex("CategoryName");
 
                     b.ToTable("SubCategory", (string)null);
                 });
@@ -283,6 +295,7 @@ namespace AsianMarketplace_WebAPI.Migrations
                     b.HasOne("AsianMarketplace_WebAPI.Models.Shopper", "User")
                         .WithMany("CartItems")
                         .HasForeignKey("UserId")
+                        .HasPrincipalKey("Username")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("CartItem_UserID_FK");
@@ -308,6 +321,8 @@ namespace AsianMarketplace_WebAPI.Migrations
                     b.HasOne("AsianMarketplace_WebAPI.Models.Shopper", "UsernameNavigation")
                         .WithMany("Orders")
                         .HasForeignKey("Username")
+                        .HasPrincipalKey("Username")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("Shopper_FK");
 
@@ -340,6 +355,7 @@ namespace AsianMarketplace_WebAPI.Migrations
                     b.HasOne("AsianMarketplace_WebAPI.Models.Shopper", "User")
                         .WithMany("ShoppingLists")
                         .HasForeignKey("UserId")
+                        .HasPrincipalKey("Username")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("ShoppingList_UserID_FK");
@@ -370,9 +386,15 @@ namespace AsianMarketplace_WebAPI.Migrations
 
             modelBuilder.Entity("AsianMarketplace_WebAPI.Models.SubCategory", b =>
                 {
-                    b.HasOne("AsianMarketplace_WebAPI.Models.Category", null)
+                    b.HasOne("AsianMarketplace_WebAPI.Models.Category", "CategoryNameNavigation")
                         .WithMany("SubCategories")
-                        .HasForeignKey("CategoryId");
+                        .HasForeignKey("CategoryName")
+                        .HasPrincipalKey("Name")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("Category_FK");
+
+                    b.Navigation("CategoryNameNavigation");
                 });
 
             modelBuilder.Entity("AsianMarketplace_WebAPI.Models.Category", b =>

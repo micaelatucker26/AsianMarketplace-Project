@@ -1,22 +1,6 @@
 [
   {
     "ContainingType": "AsianMarketplace_WebAPI.Controllers.CartItemController",
-    "Method": "CreateCartItem",
-    "RelativePath": "api/CartItem",
-    "HttpMethod": "POST",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "cartItemDTO",
-        "Type": "AsianMarketplace_WebAPI.DTOs.CartItemDTO",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "AsianMarketplace_WebAPI.Controllers.CartItemController",
     "Method": "GetCartItems",
     "RelativePath": "api/CartItem",
     "HttpMethod": "GET",
@@ -25,7 +9,7 @@
     "Parameters": [],
     "ReturnTypes": [
       {
-        "Type": "System.Collections.Generic.IEnumerable\u00601[[AsianMarketplace_WebAPI.DTOs.CartItemDTO, AsianMarketplace_WebAPI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "Type": "System.Collections.Generic.IEnumerable\u00601[[AsianMarketplace_WebAPI.DTOs.Responses.CartItemResponseDTO, AsianMarketplace_WebAPI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -38,25 +22,20 @@
   {
     "ContainingType": "AsianMarketplace_WebAPI.Controllers.CartItemController",
     "Method": "GetCartItem",
-    "RelativePath": "api/CartItem/{itemId}/{userId}",
+    "RelativePath": "api/CartItem/{cartItemId}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "itemId",
+        "Name": "cartItemId",
         "Type": "System.Guid",
-        "IsRequired": true
-      },
-      {
-        "Name": "userId",
-        "Type": "System.String",
         "IsRequired": true
       }
     ],
     "ReturnTypes": [
       {
-        "Type": "AsianMarketplace_WebAPI.DTOs.CartItemDTO",
+        "Type": "AsianMarketplace_WebAPI.DTOs.Responses.CartItemResponseDTO",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -69,19 +48,14 @@
   {
     "ContainingType": "AsianMarketplace_WebAPI.Controllers.CartItemController",
     "Method": "UpdateCartItem",
-    "RelativePath": "api/CartItem/{itemId}/{userId}",
+    "RelativePath": "api/CartItem/{cartItemId}",
     "HttpMethod": "PUT",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "itemId",
+        "Name": "cartItemId",
         "Type": "System.Guid",
-        "IsRequired": true
-      },
-      {
-        "Name": "userId",
-        "Type": "System.String",
         "IsRequired": true
       },
       {
@@ -95,8 +69,24 @@
   {
     "ContainingType": "AsianMarketplace_WebAPI.Controllers.CartItemController",
     "Method": "DeleteCartItem",
-    "RelativePath": "api/CartItem/{itemId}/{userId}",
+    "RelativePath": "api/CartItem/{cartItemId}",
     "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "cartItemId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "AsianMarketplace_WebAPI.Controllers.CartItemController",
+    "Method": "CreateCartItem",
+    "RelativePath": "api/CartItem/{itemId}/{username}",
+    "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
     "Parameters": [
@@ -106,8 +96,13 @@
         "IsRequired": true
       },
       {
-        "Name": "userId",
+        "Name": "username",
         "Type": "System.String",
+        "IsRequired": true
+      },
+      {
+        "Name": "cartItemDTO",
+        "Type": "AsianMarketplace_WebAPI.DTOs.CartItemDTO",
         "IsRequired": true
       }
     ],
@@ -625,22 +620,6 @@
   },
   {
     "ContainingType": "AsianMarketplace_WebAPI.Controllers.ShoppingListController",
-    "Method": "CreateShoppingList",
-    "RelativePath": "api/ShoppingList",
-    "HttpMethod": "POST",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "shoppingListDTO",
-        "Type": "AsianMarketplace_WebAPI.DTOs.ShoppingListDTO",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "AsianMarketplace_WebAPI.Controllers.ShoppingListController",
     "Method": "GetShoppingLists",
     "RelativePath": "api/ShoppingList",
     "HttpMethod": "GET",
@@ -662,7 +641,7 @@
   {
     "ContainingType": "AsianMarketplace_WebAPI.Controllers.ShoppingListController",
     "Method": "GetShoppingList",
-    "RelativePath": "api/ShoppingList/{title}/{userId}",
+    "RelativePath": "api/ShoppingList/{title}/{username}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -673,7 +652,7 @@
         "IsRequired": true
       },
       {
-        "Name": "userId",
+        "Name": "username",
         "Type": "System.String",
         "IsRequired": true
       }
@@ -693,7 +672,7 @@
   {
     "ContainingType": "AsianMarketplace_WebAPI.Controllers.ShoppingListController",
     "Method": "UpdateShoppingList",
-    "RelativePath": "api/ShoppingList/{title}/{userId}",
+    "RelativePath": "api/ShoppingList/{title}/{username}",
     "HttpMethod": "PUT",
     "IsController": true,
     "Order": 0,
@@ -704,7 +683,7 @@
         "IsRequired": true
       },
       {
-        "Name": "userId",
+        "Name": "username",
         "Type": "System.String",
         "IsRequired": true
       },
@@ -719,7 +698,7 @@
   {
     "ContainingType": "AsianMarketplace_WebAPI.Controllers.ShoppingListController",
     "Method": "DeleteShoppingList",
-    "RelativePath": "api/ShoppingList/{title}/{userId}",
+    "RelativePath": "api/ShoppingList/{title}/{username}",
     "HttpMethod": "DELETE",
     "IsController": true,
     "Order": 0,
@@ -730,8 +709,29 @@
         "IsRequired": true
       },
       {
-        "Name": "userId",
+        "Name": "username",
         "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "AsianMarketplace_WebAPI.Controllers.ShoppingListController",
+    "Method": "CreateShoppingList",
+    "RelativePath": "api/ShoppingList/{username}",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "username",
+        "Type": "System.String",
+        "IsRequired": true
+      },
+      {
+        "Name": "shoppingListDTO",
+        "Type": "AsianMarketplace_WebAPI.DTOs.ShoppingListDTO",
         "IsRequired": true
       }
     ],
