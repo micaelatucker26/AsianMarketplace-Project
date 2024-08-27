@@ -1,4 +1,5 @@
 ﻿using AsianMarketplace_WebAPI.DTOs;
+using AsianMarketplace_WebAPI.DTOs.Responses;
 using AsianMarketplace_WebAPI.Interfaces;
 using AsianMarketplace_WebAPI.Models;
 using AutoMapper;
@@ -13,15 +14,17 @@ namespace AsianMarketplace_WebAPI.Controllers
     {
         private readonly IMapper _mapper;
         private readonly ICartItemRepo _cartItemRepo;
+        private readonly IShopperRepo _shopperRepo;
 
-        public CartItemController( IMapper mapper, ICartItemRepo cartItemRepo)
+        public CartItemController( IMapper mapper, ICartItemRepo cartItemRepo, IShopperRepo shopperRepo)
         {
             _mapper = mapper;
             _cartItemRepo = cartItemRepo;
+            _shopperRepo = shopperRepo;
         }
 
-        [HttpPost]
-        public async Task<IActionResult> CreateCartItem([FromBody] CartItemDTO cartItemDTO)
+        [HttpPost("{itemId}/{username}")]
+        public async Task<IActionResult> CreateCartItem(Guid itemId, string username, [FromBody] CartItemDTO cartItemDTO)
         {
             try
             {
@@ -30,13 +33,34 @@ namespace AsianMarketplace_WebAPI.Controllers
 
                 if (cartItemDTO.Quantity > 0)
                 {
+                    var user = await _shopperRepo.GetShopper(username);
+                    if(user == null)
+                    {
+                        return NotFound("User not found");
+                    }
+
+                    var cartItem = new CartItem
+                    {
+                        ItemId = itemId,
+                        UserId = user.UserId,
+                        Quantity = cartItemDTO.Quantity
+                    };
+
                     // Add the new cart item to the context
-                    await _cartItemRepo.CreateCartItem(newCartItem);
+                    await _cartItemRepo.CreateCartItem(cartItem);
+
+                    var responseDTO = new CartItemResponseDTO
+                    {
+                        ItemId = cartItem.ItemId,
+                        UserId = cartItem.UserId,
+                        Quantity = cartItem.Quantity
+                    };
+                    var resultDTO = _mapper.Map<CartItemDTO>(newCartItem);
 
                     // Return that cart item's details (including quantity, itemId, and userId)
                     return
                         CreatedAtAction(nameof(GetCartItem),
-                        new { itemId = newCartItem.ItemId, userId = newCartItem.UserId }, cartItemDTO);
+                        new { cartItemId = newCartItem.CartItemId }, responseDTO);
                 }
                 else
                 {
@@ -57,7 +81,7 @@ namespace AsianMarketplace_WebAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<CartItemDTO>>> GetCartItems()
+        public async Task<ActionResult<IEnumerable<CartItemResponseDTO>>> GetCartItems()
         {
             try
             {
@@ -68,7 +92,7 @@ namespace AsianMarketplace_WebAPI.Controllers
                     return NotFound();
                 }
                 // Map the list of cart items to the DTO
-                var cartItemDTOs = _mapper.Map<List<CartItemDTO>>(cartItems);
+                var cartItemDTOs = _mapper.Map<List<CartItemResponseDTO>>(cartItems);
                 return Ok(cartItemDTOs);
             }
             catch(Exception ex)
@@ -78,11 +102,11 @@ namespace AsianMarketplace_WebAPI.Controllers
             }
         }
 
-        [HttpGet("{itemId}/{userId}")]
-        public async Task<ActionResult<CartItemDTO>> GetCartItem(Guid itemId, string userId)
+        [HttpGet("{cartItemId}")]
+        public async Task<ActionResult<CartItemResponseDTO>> GetCartItem(Guid cartItemId)
         {
             // Fetch the existing cart item from the database
-            var cartItem = await _cartItemRepo.GetCartItem(itemId, userId);
+            var cartItem = await _cartItemRepo.GetCartItem(cartItemId);
 
             if (cartItem == null)
             {
@@ -91,7 +115,7 @@ namespace AsianMarketplace_WebAPI.Controllers
             try
             {
                 // Map that cart item to the DTO
-                var cartItemDTO = _mapper.Map<CartItemDTO>(cartItem);
+                var cartItemDTO = _mapper.Map<CartItemResponseDTO>(cartItem);
                 return Ok(cartItemDTO);
             }
             catch (Exception ex)
@@ -101,15 +125,15 @@ namespace AsianMarketplace_WebAPI.Controllers
             }
         }
 
-        [HttpPut("{itemId}/{userId}")]
-        public async Task<IActionResult> UpdateCartItem( Guid itemId, string userId, [FromBody] CartItemDTO cartItemDTO)
+        [HttpPut("{cartItemId}")]
+        public async Task<IActionResult> UpdateCartItem( Guid cartItemId, [FromBody] CartItemDTO cartItemDTO)
         {
             try
             {
                 if (cartItemDTO.Quantity > 0)
                 {
                     // Fetch the existing cart item from the database
-                    var cartItem = await _cartItemRepo.UpdateCartItem(itemId, userId, cartItemDTO);
+                    var cartItem = await _cartItemRepo.UpdateCartItem(cartItemId, cartItemDTO);
                     if (cartItem == null)
                     {
                         return NotFound();
@@ -129,13 +153,13 @@ namespace AsianMarketplace_WebAPI.Controllers
             }
         }
 
-        [HttpDelete("{itemId}/{userId}")]
-        public async Task<IActionResult> DeleteCartItem(Guid itemId, string userId)
+        [HttpDelete("{cartItemId}")]
+        public async Task<IActionResult> DeleteCartItem(Guid cartItemId)
         {
             try
             {
                 // Fetch the existing cart item from the database
-                var cartItem = await _cartItemRepo.DeleteCartItem(itemId, userId);
+                var cartItem = await _cartItemRepo.DeleteCartItem(cartItemId);
                 if (cartItem == null)
                 {
                     return NotFound();

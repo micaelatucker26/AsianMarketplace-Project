@@ -8,7 +8,7 @@ namespace AsianMarketplace_WebAPI.Interfaces
         Task<List<Shopper>> GetShoppers();
         Task<Shopper> GetShopper(string name);
         Task<Shopper> CreateShopper(Shopper shopper);
-        //Task<Shopper> UpdateShopper(string name, ShopperDTO shopperDTO);
+        Task<Shopper> UpdateShopper(string name, ShopperDTO shopperDTO);
         Task<Shopper> DeleteShopper(string name);
     }
 }

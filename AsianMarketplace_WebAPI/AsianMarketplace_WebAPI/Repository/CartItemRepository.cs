@@ -20,9 +20,9 @@ namespace AsianMarketplace_WebAPI.Repository
             return newCartItem;
         }
 
-        public async Task<CartItem> DeleteCartItem(Guid itemId, string userId)
+        public async Task<CartItem> DeleteCartItem(Guid cartItemId)
         {
-            var cartItem = await _marketplaceDbContext.CartItems.FindAsync(itemId, userId);
+            var cartItem = await _marketplaceDbContext.CartItems.FindAsync(cartItemId);
             if (cartItem == null)
             {
                 return null;
@@ -33,9 +33,9 @@ namespace AsianMarketplace_WebAPI.Repository
             return cartItem;
         }
 
-        public async Task<CartItem> GetCartItem(Guid itemId, string userId)
+        public async Task<CartItem> GetCartItem( Guid cartItemId)
         {
-            var cartItem = await _marketplaceDbContext.CartItems.FindAsync(itemId, userId);
+            var cartItem = await _marketplaceDbContext.CartItems.FindAsync(cartItemId);
             if (cartItem == null)
             {
                 return null;
@@ -45,7 +45,8 @@ namespace AsianMarketplace_WebAPI.Repository
 
         public async Task<List<CartItem>> GetCartItems()
         {
-            var cartItems = await _marketplaceDbContext.CartItems.ToListAsync();
+            var cartItems = await _marketplaceDbContext.CartItems
+                .ToListAsync();
             if(cartItems == null)
             {
                 return null;
@@ -53,17 +54,15 @@ namespace AsianMarketplace_WebAPI.Repository
             return cartItems;
         }
 
-        public async Task<CartItem> UpdateCartItem(Guid itemId, string userId, CartItemDTO cartItemDTO)
+        public async Task<CartItem> UpdateCartItem(Guid cartItemId, CartItemDTO cartItemDTO)
         {
-            var existingCartItem = await _marketplaceDbContext.CartItems.FindAsync(itemId, userId);
+            var existingCartItem = await _marketplaceDbContext.CartItems.FindAsync(cartItemId);
             if(existingCartItem == null)
             {
                 return null;
             }
 
             existingCartItem.Quantity = cartItemDTO.Quantity;
-            existingCartItem.ItemId = itemId;
-            existingCartItem.UserId = userId;
 
             await _marketplaceDbContext.SaveChangesAsync();
             return existingCartItem;

@@ -12,9 +12,9 @@ namespace AsianMarketplace_WebAPI.Models
 
         public Guid OrderId { get; set; }
         public DateTime OrderDate { get; set; }
-        public string Username { get; set; } = null!;
+        public Guid UserId { get; set; }
 
-        public virtual Shopper UsernameNavigation { get; set; } = null!;
+        public virtual Shopper User { get; set; } = null!;
         public virtual ICollection<OrderItem> OrderItems { get; set; }
     }
 }

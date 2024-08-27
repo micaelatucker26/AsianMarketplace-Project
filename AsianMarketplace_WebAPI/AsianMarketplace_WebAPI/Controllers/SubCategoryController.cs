@@ -114,7 +114,7 @@ namespace AsianMarketplace_WebAPI.Controllers
             {
                 // The name and category name will be updated
                 subCategory.Name = name;
-                subCategory.CategoryName = subCategoryDTO.CategoryName;
+                subCategory.Category.Name = subCategoryDTO.CategoryName;
 
                 // Save changes to the database
                 await _marketplaceDbContext.SaveChangesAsync();

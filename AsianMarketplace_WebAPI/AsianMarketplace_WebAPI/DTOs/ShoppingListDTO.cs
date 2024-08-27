@@ -4,7 +4,6 @@
     {
         public string Title { get; set; }
         public char IsActive { get; set; } = 'N';
-        public string UserId { get; set; }
         public DateTime DateCreated { get; set; } = DateTime.Now;
     }
 }

@@ -1,4 +1,5 @@
 ﻿using AsianMarketplace_WebAPI.DTOs;
+using AsianMarketplace_WebAPI.Interfaces;
 using AsianMarketplace_WebAPI.Models;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
@@ -10,28 +11,32 @@ namespace AsianMarketplace_WebAPI.Controllers
     [Route("api/[controller]")]
     public class ShoppingListController : Controller
     {
-        private readonly AsianMarketplaceDbContext _marketplaceDbContext;
         private readonly IMapper _mapper;
+        private readonly IShoppingListRepo _shoppingListRepo;
+        private readonly IShopperRepo _shopperRepo;
 
-        public ShoppingListController(AsianMarketplaceDbContext marketplaceDbContext, IMapper mapper)
+        public ShoppingListController(IMapper mapper, IShoppingListRepo shoppingListRepo, IShopperRepo shopperRepo)
         {
-            _marketplaceDbContext = marketplaceDbContext;
             _mapper = mapper;
+            _shoppingListRepo = shoppingListRepo;
+            _shopperRepo = shopperRepo;
         }
 
-        [HttpPost]
-        public async Task<IActionResult> CreateShoppingList([FromBody] ShoppingListDTO shoppingListDTO)
+        [HttpPost("{username}")]
+        public async Task<IActionResult> CreateShoppingList(string username, [FromBody] ShoppingListDTO shoppingListDTO)
         {
             try
             {
                 //Map the DTO to the entity
                 var newShoppingList = _mapper.Map<ShoppingList>(shoppingListDTO);
 
-                //Add the new shopping list to the context
-                _marketplaceDbContext.ShoppingLists.Add(newShoppingList);
+                var user = await _shopperRepo.GetShopper(username);
 
-                //Save changes to the database
-               await _marketplaceDbContext.SaveChangesAsync();
+                newShoppingList.User = user;
+                newShoppingList.UserId = user.UserId;
+
+                // Add the new shopping list to the context
+                await _shoppingListRepo.CreateShoppingList(newShoppingList);
 
                 //Return that shopping list's details (including title, isactive, userId, and date created)
                 return
@@ -56,7 +61,7 @@ namespace AsianMarketplace_WebAPI.Controllers
             try
             {
                 //Gather shopping lists into a list
-                var lists = await _marketplaceDbContext.ShoppingLists.ToListAsync();
+                var lists = await _shoppingListRepo.GetShoppingLists();
                 if (lists == null)
                 {
                     return NotFound();
@@ -73,12 +78,17 @@ namespace AsianMarketplace_WebAPI.Controllers
         }
 
 
-        [HttpGet("{title}/{userId}")]
-        public async Task<ActionResult<ShoppingListDTO>> GetShoppingList(string title, string userId)
+        [HttpGet("{title}/{username}")]
+        public async Task<ActionResult<ShoppingListDTO>> GetShoppingList(string title, string username)
         {
+            var user = await _shopperRepo.GetShopper(username);
+            if(user == null)
+            {
+                return NotFound();
+            }
+
             //Fetch the existing shopping list from the database
-            var shoppingList = await _marketplaceDbContext.ShoppingLists
-                .FirstOrDefaultAsync(sl => sl.Title == title && sl.UserId == userId);
+            var shoppingList = await _shoppingListRepo.GetShoppingList(title, user.UserId);
             if (shoppingList == null)
             {
                 return NotFound();
@@ -96,37 +106,24 @@ namespace AsianMarketplace_WebAPI.Controllers
             }
         }
 
-        [HttpPut("{title}/{userId}")]
-        public async Task<IActionResult> UpdateShoppingList(string title, string userId, [FromBody] ShoppingListDTO shoppingListDTO)
+        [HttpPut("{title}/{username}")]
+        public async Task<IActionResult> UpdateShoppingList(string title, string username, [FromBody] ShoppingListDTO shoppingListDTO)
         {
-            // Fetch the existing user from the database
-            var shoppingList = await _marketplaceDbContext.ShoppingLists.FindAsync(title, userId);
-            if (shoppingList == null)
-            {
-                return NotFound();
-            }
-
-            // Create a new shopping list with the updated title
-            //var updatedShoppingList = new ShoppingList
-            //{
-            //    Title = shoppingListDTO.Title, // New title
-            //    UserId = userId,
-            //    IsActive = shoppingListDTO.IsActive, // Default value of 'N'
-            //    //DateCreated = shoppingList.DateCreated // Preserve the original creation date
-            //};
-
             try
             {
-                // Remove the old shopping list
-                //_marketplaceDbContext.ShoppingLists.Remove(shoppingList);
-
-                //// Add the new shopping list
-                //_marketplaceDbContext.ShoppingLists.Add(updatedShoppingList);
-
-                // Save changes to the database
-                //await _marketplaceDbContext.SaveChangesAsync();
-
-                // Return a response
+                var user = await _shopperRepo.GetShopper(username);
+                if (user == null)
+                {
+                    return NotFound();
+                }
+                // Fetch the existing shopping list from the database
+                var shoppingList = await _shoppingListRepo.GetShoppingList(title, user.UserId);
+                if (shoppingList == null)
+                {
+                    return NotFound();
+                }
+                // Update the context with the new shopping list information
+                var newShoppingList = await _shoppingListRepo.UpdateShoppingList(title, user.UserId, shoppingListDTO);
                 return NoContent();
             }
             catch (Exception ex)
@@ -136,25 +133,22 @@ namespace AsianMarketplace_WebAPI.Controllers
             }
         }
 
-        [HttpDelete("{title}/{userId}")]
-        public async Task<IActionResult> DeleteShoppingList(string title, string userId)
+        [HttpDelete("{title}/{username}")]
+        public async Task<IActionResult> DeleteShoppingList(string title, string username)
         {
-            //Fetch the existing user from the database
-
-           var shoppingList = await _marketplaceDbContext.ShoppingLists.FindAsync(title, userId);
-            if (shoppingList == null)
-            {
-                return NotFound();
-            }
             try
             {
-                //Remove that shopping list from the database
-
-               _marketplaceDbContext.ShoppingLists.Remove(shoppingList);
-
-                // Save changes to the database
-                await _marketplaceDbContext.SaveChangesAsync();
-
+                var user = await _shopperRepo.GetShopper(username);
+                if (user == null)
+                {
+                    return NotFound();
+                }
+                // Try to delete the shopping list from the database
+                var shoppingList = await _shoppingListRepo.DeleteShoppingList(title, user.UserId);
+                if (shoppingList == null)
+                {
+                    return NotFound();
+                }
                 return NoContent();
             }
             catch (Exception ex)

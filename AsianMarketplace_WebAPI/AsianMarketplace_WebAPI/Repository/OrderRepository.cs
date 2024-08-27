@@ -62,7 +62,7 @@ namespace AsianMarketplace_WebAPI.Repository
             }
 
             existingOrder.OrderDate = orderDTO.OrderDate;
-            existingOrder.Username = orderDTO.Username;
+            //existingOrder.Username = orderDTO.Username;
 
             await _marketplaceDbContext.SaveChangesAsync();
             return existingOrder;

@@ -39,17 +39,15 @@ namespace AsianMarketplace_WebAPI.Models
         {
             modelBuilder.Entity<CartItem>(entity =>
             {
-                entity.HasKey(e => new { e.ItemId, e.UserId })
-                    .HasName("PK__CartItem__A3060F2106CCBB11");
-
                 entity.ToTable("CartItem");
+
+                entity.Property(e => e.CartItemId)
+                    .HasColumnName("CartItemID")
+                    .HasDefaultValueSql("(newid())");
 
                 entity.Property(e => e.ItemId).HasColumnName("ItemID");
 
-                entity.Property(e => e.UserId)
-                    .HasMaxLength(25)
-                    .IsUnicode(false)
-                    .HasColumnName("UserID");
+                entity.Property(e => e.UserId).HasColumnName("UserID");
 
                 entity.HasOne(d => d.Item)
                     .WithMany(p => p.CartItems)
@@ -58,7 +56,6 @@ namespace AsianMarketplace_WebAPI.Models
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.CartItems)
-                    .HasPrincipalKey(p => p.Username)
                     .HasForeignKey(d => d.UserId)
                     .HasConstraintName("CartItem_UserID_FK");
             });
@@ -67,10 +64,9 @@ namespace AsianMarketplace_WebAPI.Models
             {
                 entity.ToTable("Category");
 
-                entity.HasIndex(e => e.Name, "UC_Category_Name")
-                    .IsUnique();
-
-                entity.Property(e => e.CategoryId).HasColumnName("CategoryID");
+                entity.Property(e => e.CategoryId)
+                    .HasColumnName("CategoryID")
+                    .HasDefaultValueSql("(newid())");
 
                 entity.Property(e => e.Name)
                     .HasMaxLength(25)
@@ -100,14 +96,11 @@ namespace AsianMarketplace_WebAPI.Models
 
                 entity.Property(e => e.Price).HasColumnType("money");
 
-                entity.Property(e => e.SubCategoryName)
-                    .HasMaxLength(25)
-                    .IsUnicode(false);
+                entity.Property(e => e.SubCategoryId).HasColumnName("SubCategoryID");
 
-                entity.HasOne(d => d.SubCategoryNameNavigation)
+                entity.HasOne(d => d.SubCategory)
                     .WithMany(p => p.Items)
-                    .HasForeignKey(d => d.SubCategoryName)
-                    .OnDelete(DeleteBehavior.SetNull)
+                    .HasForeignKey(d => d.SubCategoryId)
                     .HasConstraintName("SubCategory_FK");
             });
 
@@ -121,21 +114,18 @@ namespace AsianMarketplace_WebAPI.Models
 
                 entity.Property(e => e.OrderDate).HasColumnType("datetime");
 
-                entity.Property(e => e.Username)
-                    .HasMaxLength(25)
-                    .IsUnicode(false);
+                entity.Property(e => e.UserId).HasColumnName("UserID");
 
-                entity.HasOne(d => d.UsernameNavigation)
+                entity.HasOne(d => d.User)
                     .WithMany(p => p.Orders)
-                    .HasPrincipalKey(p => p.Username)
-                    .HasForeignKey(d => d.Username)
+                    .HasForeignKey(d => d.UserId)
                     .HasConstraintName("Shopper_FK");
             });
 
             modelBuilder.Entity<OrderItem>(entity =>
             {
                 entity.HasKey(e => new { e.ItemId, e.OrderId })
-                    .HasName("PK__OrderIte__9E478651E5C85267");
+                    .HasName("PK__OrderIte__9E478651C1B375E1");
 
                 entity.ToTable("OrderItem");
 
@@ -159,14 +149,16 @@ namespace AsianMarketplace_WebAPI.Models
             modelBuilder.Entity<Shopper>(entity =>
             {
                 entity.HasKey(e => e.UserId)
-                    .HasName("PK__Shopper__1788CCACC91DA542");
+                    .HasName("PK__Shopper__1788CCACC649A93D");
 
                 entity.ToTable("Shopper");
 
-                entity.HasIndex(e => e.Username, "UC_Shopper_Name")
+                entity.HasIndex(e => e.Username, "UQ__Shopper__536C85E40EDF9E14")
                     .IsUnique();
 
-                entity.Property(e => e.UserId).HasColumnName("UserID");
+                entity.Property(e => e.UserId)
+                    .HasColumnName("UserID")
+                    .HasDefaultValueSql("(newid())");
 
                 entity.Property(e => e.Password)
                     .HasMaxLength(255)
@@ -179,19 +171,11 @@ namespace AsianMarketplace_WebAPI.Models
 
             modelBuilder.Entity<ShoppingList>(entity =>
             {
-                entity.HasKey(e => new { e.Title, e.UserId })
-                    .HasName("PK__Shopping__FDCEE8177E466141");
-
                 entity.ToTable("ShoppingList");
 
-                entity.Property(e => e.Title)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.UserId)
-                    .HasMaxLength(25)
-                    .IsUnicode(false)
-                    .HasColumnName("UserID");
+                entity.Property(e => e.ShoppingListId)
+                    .HasColumnName("ShoppingListID")
+                    .HasDefaultValueSql("(newid())");
 
                 entity.Property(e => e.DateCreated).HasColumnType("datetime");
 
@@ -201,36 +185,39 @@ namespace AsianMarketplace_WebAPI.Models
                     .HasDefaultValueSql("('N')")
                     .IsFixedLength();
 
+                entity.Property(e => e.Title)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserId).HasColumnName("UserID");
+
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.ShoppingLists)
-                    .HasPrincipalKey(p => p.Username)
                     .HasForeignKey(d => d.UserId)
                     .HasConstraintName("ShoppingList_UserID_FK");
             });
 
             modelBuilder.Entity<ShoppingListItem>(entity =>
             {
-                entity.HasKey(e => new { e.Title, e.UserId, e.ItemId })
-                    .HasName("PK__Shopping__17BC9694005304B1");
-
                 entity.ToTable("ShoppingListItem");
 
-                entity.Property(e => e.Title)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.UserId)
-                    .HasMaxLength(25)
-                    .IsUnicode(false)
-                    .HasColumnName("UserID");
-
-                entity.Property(e => e.ItemId).HasColumnName("ItemID");
+                entity.Property(e => e.ShoppingListItemId)
+                    .HasColumnName("ShoppingListItemID")
+                    .HasDefaultValueSql("(newid())");
 
                 entity.Property(e => e.IsCrossedOff)
                     .HasMaxLength(1)
                     .IsUnicode(false)
                     .HasDefaultValueSql("('N')")
                     .IsFixedLength();
+
+                entity.Property(e => e.ItemId).HasColumnName("ItemID");
+
+                entity.Property(e => e.ShoppingListId).HasColumnName("ShoppingListID");
+
+                entity.Property(e => e.Title)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
                 entity.HasOne(d => d.Item)
                     .WithMany(p => p.ShoppingListItems)
@@ -239,29 +226,30 @@ namespace AsianMarketplace_WebAPI.Models
 
                 entity.HasOne(d => d.ShoppingList)
                     .WithMany(p => p.ShoppingListItems)
-                    .HasForeignKey(d => new { d.Title, d.UserId })
+                    .HasForeignKey(d => d.ShoppingListId)
                     .HasConstraintName("ShoppingListItem_ShoppingList_FK");
             });
 
             modelBuilder.Entity<SubCategory>(entity =>
             {
-                entity.HasKey(e => e.Name)
-                    .HasName("PK__SubCateg__737584F73EE87B95");
-
                 entity.ToTable("SubCategory");
+
+                entity.HasIndex(e => e.Name, "UQ__SubCateg__737584F62ED49748")
+                    .IsUnique();
+
+                entity.Property(e => e.SubCategoryId)
+                    .HasColumnName("SubCategoryID")
+                    .HasDefaultValueSql("(newid())");
+
+                entity.Property(e => e.CategoryId).HasColumnName("CategoryID");
 
                 entity.Property(e => e.Name)
                     .HasMaxLength(25)
                     .IsUnicode(false);
 
-                entity.Property(e => e.CategoryName)
-                    .HasMaxLength(25)
-                    .IsUnicode(false);
-
-                entity.HasOne(d => d.CategoryNameNavigation)
+                entity.HasOne(d => d.Category)
                     .WithMany(p => p.SubCategories)
-                    .HasPrincipalKey(p => p.Name)
-                    .HasForeignKey(d => d.CategoryName)
+                    .HasForeignKey(d => d.CategoryId)
                     .HasConstraintName("Category_FK");
             });
 
