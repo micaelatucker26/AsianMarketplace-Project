@@ -42,6 +42,16 @@ namespace AsianMarketplace_WebAPI.Repository
             return orderItem;
         }
 
+        //public async Task<List<OrderItem>> GetOrderItems_ByOrder(Guid orderId)
+        //{
+        //    var orderItems = await _marketplaceDbContext.OrderItems.Include(oi => oi.Order).ToListAsync();
+        //    if (orderItems == null)
+        //    {
+        //        return null;
+        //    }
+        //    return orderItems;
+        //}
+
         public async Task<List<OrderItem>> GetOrderItems()
         {
             var orderItems = await _marketplaceDbContext.OrderItems.ToListAsync();

@@ -308,22 +308,6 @@
   },
   {
     "ContainingType": "AsianMarketplace_WebAPI.Controllers.OrderController",
-    "Method": "CreateOrder",
-    "RelativePath": "api/Order",
-    "HttpMethod": "POST",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "orderDTO",
-        "Type": "AsianMarketplace_WebAPI.DTOs.OrderDTO",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "AsianMarketplace_WebAPI.Controllers.OrderController",
     "Method": "GetOrders",
     "RelativePath": "api/Order",
     "HttpMethod": "GET",
@@ -332,7 +316,7 @@
     "Parameters": [],
     "ReturnTypes": [
       {
-        "Type": "System.Collections.Generic.IEnumerable\u00601[[AsianMarketplace_WebAPI.DTOs.OrderDTO, AsianMarketplace_WebAPI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "Type": "System.Collections.Generic.IEnumerable\u00601[[AsianMarketplace_WebAPI.DTOs.Responses.OrderResponseDTO, AsianMarketplace_WebAPI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -400,6 +384,27 @@
       {
         "Name": "orderId",
         "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "AsianMarketplace_WebAPI.Controllers.OrderController",
+    "Method": "CreateOrder",
+    "RelativePath": "api/Order/{userId}",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "userId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      },
+      {
+        "Name": "orderDTO",
+        "Type": "AsianMarketplace_WebAPI.DTOs.OrderDTO",
         "IsRequired": true
       }
     ],

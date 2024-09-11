@@ -1,34 +1,82 @@
 ﻿using AsianMarketplace_WebAPI.DTOs;
 using AsianMarketplace_WebAPI.Interfaces;
 using AsianMarketplace_WebAPI.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace AsianMarketplace_WebAPI.Repository
 {
     public class SubCategoryRepository : ISubCategoryRepo
     {
-        public Task<SubCategory> CreateSubCategory(SubCategory subCategory)
+        private readonly AsianMarketplaceDbContext _marketplaceDbContext;
+
+        public SubCategoryRepository(AsianMarketplaceDbContext context)
         {
-            throw new NotImplementedException();
+            _marketplaceDbContext = context;
+        }
+        public async Task<SubCategory> CreateSubCategory(SubCategory subCategory)
+        {
+            // Add the new subcategory to the context
+            await _marketplaceDbContext.SubCategories.AddAsync(subCategory);
+
+            // Save changes to the database
+            await _marketplaceDbContext.SaveChangesAsync();
+            return subCategory;
         }
 
-        public Task<SubCategory> DeleteSubCategory(string name)
+        public async Task<SubCategory> DeleteSubCategory(string name)
         {
-            throw new NotImplementedException();
+            var subCategory = await _marketplaceDbContext.SubCategories.FirstOrDefaultAsync(sc => sc.Name == name);
+            if (subCategory == null)
+            {
+                return null;
+            }
+            // Remove that subcategory from the database
+            _marketplaceDbContext.SubCategories.Remove(subCategory);
+
+            // Save changes to the database
+            await _marketplaceDbContext.SaveChangesAsync();
+            return subCategory;
         }
 
-        public Task<List<SubCategory>> GetSubCategories()
+        public async Task<List<SubCategory>> GetSubCategories()
         {
-            throw new NotImplementedException();
+            var subCategories = await _marketplaceDbContext.SubCategories
+                .Include(s => s.Items)
+                .Include(s => s.Category)
+                .ToListAsync();
+            if (subCategories == null)
+            {
+                return null;
+            }
+            return subCategories;
         }
 
-        public Task<SubCategory> GetSubCategory(string name)
+        public async Task<SubCategory> GetSubCategory(string name)
         {
-            throw new NotImplementedException();
+            var subCategory = await _marketplaceDbContext.SubCategories.Include(sc => sc.Category).FirstOrDefaultAsync(sc => sc.Name == name);
+            if (subCategory == null)
+            {
+                return null;
+            }
+            return subCategory;
         }
 
-        public Task<SubCategory> UpdateSubCategory(string name, SubCategoryDTO subCategoryDTO)
+        public async Task<SubCategory> UpdateSubCategory(string name, SubCategoryDTO subCategoryDTO)
         {
-            throw new NotImplementedException();
+            var existingSubCategory = await _marketplaceDbContext.SubCategories
+                .Include(sc => sc.Category)
+                .FirstOrDefaultAsync(sc => sc.Name == name);
+            if (existingSubCategory == null)
+            {
+                return null;
+            }
+            // The name and category name will be updated
+            existingSubCategory.Name = subCategoryDTO.Name;
+            existingSubCategory.Category.Name = subCategoryDTO.CategoryName;
+
+            // Save changes to the database
+            await _marketplaceDbContext.SaveChangesAsync();
+            return existingSubCategory;
         }
     }
 }

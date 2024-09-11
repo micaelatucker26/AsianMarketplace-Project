@@ -1,4 +1,5 @@
 ﻿using AsianMarketplace_WebAPI.DTOs;
+using AsianMarketplace_WebAPI.DTOs.Responses;
 using AsianMarketplace_WebAPI.Interfaces;
 using AsianMarketplace_WebAPI.Models;
 using AutoMapper;
@@ -13,33 +14,36 @@ namespace AsianMarketplace_WebAPI.Controllers
     {
         private readonly IMapper _mapper;
         private readonly IOrderRepo _orderRepo;
+        private readonly IOrderItemRepo _orderItemRepo;
 
-        public OrderController(IMapper mapper, IOrderRepo orderRepo)
+        public OrderController(IMapper mapper, IOrderRepo orderRepo, IOrderItemRepo orderItemRepo)
         {
             _mapper = mapper;
             _orderRepo = orderRepo;
+            _orderItemRepo = orderItemRepo;
         }
 
-        [HttpPost]
-        public async Task<IActionResult> CreateOrder([FromBody] OrderDTO orderDTO)
+        [HttpPost("{userId}")]
+        public async Task<IActionResult> CreateOrder(Guid userId, [FromBody] OrderDTO orderDTO)
         {
             try
             {
                 // Map the DTO to the entity
-                var newOrder = _mapper.Map<Order>(orderDTO);
+                var orderDetails = _mapper.Map<Order>(orderDTO);
 
-                // Validate the orderDTO.....
-                if(orderDTO.Username == null)
+                var order = new Order
                 {
-                    return StatusCode(StatusCodes.Status400BadRequest, new { Message = "The order requires a username associated with the order." });
-                }
+                    UserId = userId,
+                    OrderDate = orderDetails.OrderDate
+                };
+
                 // Add the new order to the context
-                await _orderRepo.CreateOrder(newOrder);
+                await _orderRepo.CreateOrder(order);
 
                 // Return that order's details (including orderId, orderdate, and username)
                 return
                     CreatedAtAction(nameof(GetOrder),
-                    new { orderId = newOrder.OrderId }, orderDTO);
+                    new { orderId = order.OrderId }, orderDTO);
             }
             catch (DbUpdateException ex)
             {
@@ -54,7 +58,7 @@ namespace AsianMarketplace_WebAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<OrderDTO>>> GetOrders()
+        public async Task<ActionResult<IEnumerable<OrderResponseDTO>>> GetOrders()
         {
             try
             {
@@ -65,7 +69,7 @@ namespace AsianMarketplace_WebAPI.Controllers
                     return NotFound();
                 }
                 // Map the list of orders to the DTO
-                var orderDTOs = _mapper.Map<List<OrderDTO>>(orders);
+                var orderDTOs = _mapper.Map<List<OrderResponseDTO>>(orders);
                 return Ok(orderDTOs);
             }
             catch (Exception ex)
@@ -102,11 +106,6 @@ namespace AsianMarketplace_WebAPI.Controllers
         {
             try
             {
-                // Validate the orderDTO.....
-                if (orderDTO.Username == null)
-                {
-                    return StatusCode(StatusCodes.Status400BadRequest, new { Message = "The order requires a username associated with the order." });
-                }
                 // Fetch the existing order from the database
                 var order =  await _orderRepo.UpdateOrder(orderId, orderDTO);
                 if (order == null)

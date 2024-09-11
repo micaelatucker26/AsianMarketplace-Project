@@ -5,6 +5,7 @@ namespace AsianMarketplace_WebAPI.Interfaces
 {
     public interface IOrderItemRepo
     {
+        //Task<List<OrderItem>> GetOrderItems_ByOrder(Guid orderId);
         Task<List<OrderItem>> GetOrderItems();
         Task<OrderItem> GetOrderItem(Guid itemId, Guid orderId);
         Task<OrderItem> CreateOrderItem(OrderItem orderItem);
