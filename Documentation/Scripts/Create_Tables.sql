@@ -1,12 +1,12 @@
---drop database AsianMarketplaceDb
+--drop database AsianMarketplaceDb;
 --create database AsianMarketplaceDb;
-use AsianMarketplaceDb;
+--use AsianMarketplaceDb;
 
 
 -- Create a table named Category to hold the main category names for groups of various goods/products
 -- in the marketplace. A category can have one or many subcategories.
 create table Category (
-	CategoryID int primary key,
+	CategoryID uniqueidentifier primary key default newid(),
 	Name varchar(25) not null
 );
 
@@ -14,10 +14,11 @@ create table Category (
 -- Create a table named SubCategory to hold the main subcategories under each category of goods/products
 -- in the marketplace. A subcategory belongs to only one category.
 create table SubCategory (
-	Name varchar(25) primary key,
-	CategoryName varchar(25) not null
-	constraint Category_FK foreign key (CategoryName) 
-		references Category(Name)
+	SubCategoryID uniqueidentifier primary key default newid(),
+	Name varchar(25) not null UNIQUE,
+	CategoryID uniqueidentifier not null,
+	constraint Category_FK foreign key (CategoryID) 
+		references Category(CategoryID)
 			on delete cascade
 			on update cascade
 );
@@ -28,8 +29,8 @@ create table SubCategory (
 -- lists. A shopper can also add zero or more items to their cart. Note: The password and salt 
 -- are combined and that value is hashed and stored in the Password field.
 create table Shopper (
-	UserID int primary key,
-	Username varchar(25) not null,
+	UserID uniqueidentifier primary key default newid(),
+	Username varchar(25) not null UNIQUE,
 	Password varchar(255) not null
 );
 
@@ -41,9 +42,9 @@ create table Shopper (
 create table [Order] (
 	OrderID uniqueidentifier primary key default newid(),
 	OrderDate datetime not null,
-	Username varchar(25) not null,
-    constraint Shopper_FK foreign key (Username) 
-		references Shopper(Username)
+	UserID uniqueidentifier not null,
+    constraint Shopper_FK foreign key (UserID) 
+		references Shopper(UserID)
 			on delete cascade
 			on update cascade
 );
@@ -59,10 +60,10 @@ create table Item (
 	Quantity int not null default 0,
 	Price money not null check (Price >= 0),
 	ImageURL varchar(255) not null,
-	SubCategoryName varchar(25) null,
-	constraint SubCategory_FK foreign key (SubCategoryName) 
-		references SubCategory(Name)
-			on delete set null
+	SubCategoryID uniqueidentifier not null,
+	constraint SubCategory_FK foreign key (SubCategoryID) 
+		references SubCategory(SubCategoryID)
+			on delete cascade
 );
 
 
@@ -91,18 +92,17 @@ create table OrderItem (
 -- composite key. The IsActive field is used when a user has one or more shopping lists and the
 -- list becomes active once items start to be added to the list and are viewed in the most
 -- recent shopping list.
-create table ShoppingList ( 
+create table ShoppingList (
+	 ShoppingListID uniqueidentifier primary key default newid(),
 	 Title varchar(50) not null,
 	 IsActive char(1) not null default 'N',
 	 DateCreated datetime not null,
-	 UserID varchar(25) not null,
-	 Primary Key (Title, UserID),
+	 UserID uniqueidentifier not null,
 	 constraint ShoppingList_UserID_FK foreign key (UserID) 
-		references Shopper(Username)
+		references Shopper(UserID)
 			on delete cascade
 			on update cascade
 );
-
 
 -- Create a table named ShoppingListItem that holds the data on items that are in a unique shopping list.
 -- A shopping list item belongs to a shopping list under a unique shopper/user and represents 
@@ -110,34 +110,34 @@ create table ShoppingList (
 -- an item from the shopping list; when the item is crossed off, it moves to another list of completed
 -- items under the current shopping list.
 create table ShoppingListItem (
+	ShoppingListItemID uniqueidentifier primary key default newid(),
 	IsCrossedOff char(1) default 'N',
 	Quantity int not null check (Quantity >= 1),
 	Title varchar(50) not null,
 	ItemID uniqueidentifier not null,
-	UserID varchar(25) not null,
-	Primary Key (Title, UserID, ItemID),
-	constraint ShoppingListItem_ShoppingList_FK foreign key (Title, UserID)
-        references ShoppingList (Title, UserID)
+    ShoppingListID uniqueidentifier not null,
+	constraint ShoppingListItem_ShoppingList_FK foreign key (ShoppingListID)
+        references ShoppingList (ShoppingListID)
 			on delete cascade,
     constraint ShoppingListItem_Item_FK foreign key (ItemID)
         references Item (ItemID)
 			on delete cascade
 );
 
-
 -- Create a table named CartItem that holds the data on items that are in a unique cart.
 -- A cart item belongs to a cart that is tied to a unique shopper/user and represents 
 -- a specific item from the Item table.
 create table CartItem (
+	CartItemID uniqueidentifier primary key default newid(),
 	Quantity int not null CHECK (Quantity >= 1),
 	ItemID uniqueidentifier not null,
-	UserID varchar(25) not null,
-	Primary Key (ItemID, UserID),
+	UserID uniqueidentifier not null,
 	constraint CartItem_ItemID_FK foreign key (ItemID) 
 		references Item(ItemID)
 			on delete cascade,
 	constraint CartItem_UserID_FK foreign key (UserID) 
-		references Shopper(Username)
+		references Shopper(UserID)
 			on delete cascade
-			on update cascade
+			on update cascade,
+	constraint UQ_CartItem_ItemID_UserID unique (ItemID, UserID)
 );
