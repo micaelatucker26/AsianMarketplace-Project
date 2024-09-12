@@ -35,7 +35,9 @@ namespace AsianMarketplace_WebAPI.Repository
 
         public async Task<Order> GetOrder(Guid orderId)
         {
-            var order = await _marketplaceDbContext.Orders.FindAsync(orderId);
+            var order = await _marketplaceDbContext.Orders
+                .Include(o => o.OrderItems) // Eagerly load the related OrderItems
+                .FirstOrDefaultAsync(o => o.OrderId == orderId);
             if (order == null)
             {
                 return null;
@@ -45,7 +47,7 @@ namespace AsianMarketplace_WebAPI.Repository
 
         public async Task<List<Order>> GetOrders()
         {
-            var orders = await _marketplaceDbContext.Orders.ToListAsync();
+            var orders = await _marketplaceDbContext.Orders.Include(o => o.OrderItems).ToListAsync();
             if (orders == null)
             {
                 return null;
@@ -55,14 +57,48 @@ namespace AsianMarketplace_WebAPI.Repository
 
         public async Task<Order> UpdateOrder(Guid orderId, OrderDTO orderDTO)
         {
-            var existingOrder = await _marketplaceDbContext.Orders.FindAsync(orderId);
+            var existingOrder = await _marketplaceDbContext.Orders
+                .Include(o => o.OrderItems)
+                .FirstOrDefaultAsync(o => o.OrderId == orderId);
             if (existingOrder == null)
             {
                 return null;
             }
 
             existingOrder.OrderDate = orderDTO.OrderDate;
-            //existingOrder.Username = orderDTO.Username;
+
+            // Update the order items
+            foreach(var itemDTO in orderDTO.OrderItems)
+            {
+                var existingOrderItem = existingOrder.OrderItems.FirstOrDefault(i => i.ItemId == itemDTO.ItemId);
+                // Update the existing order item
+                if(existingOrderItem != null)
+                {
+                    existingOrderItem.Price = itemDTO.Price;
+                    existingOrderItem.Quantity = itemDTO.Quantity;
+                }
+                // Add new order item
+                else
+                {
+                    var newOrderItem = new OrderItem
+                    {
+                        ItemId = itemDTO.ItemId,
+                        Price = itemDTO.Price,
+                        Quantity = itemDTO.Quantity,
+                        OrderId = orderId // Ensure this matches the current order
+                    };
+                    existingOrder.OrderItems.Add(newOrderItem);
+                }
+            }
+
+            // Remove order items that were deleted
+            var removedItems = existingOrder.OrderItems
+                .Where(oi => !orderDTO.OrderItems.Any(dto => dto.ItemId == oi.ItemId))
+                .ToList();
+            foreach (var removedItem in removedItems)
+            {
+                existingOrder.OrderItems.Remove(removedItem);
+            }
 
             await _marketplaceDbContext.SaveChangesAsync();
             return existingOrder;

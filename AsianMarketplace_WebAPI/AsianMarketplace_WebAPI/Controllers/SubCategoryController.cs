@@ -1,4 +1,5 @@
 ﻿using AsianMarketplace_WebAPI.DTOs;
+using AsianMarketplace_WebAPI.Interfaces;
 using AsianMarketplace_WebAPI.Models;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
@@ -10,13 +11,13 @@ namespace AsianMarketplace_WebAPI.Controllers
     [Route("api/[controller]")]
     public class SubCategoryController : Controller
     {
-        private readonly AsianMarketplaceDbContext _marketplaceDbContext;
         private readonly IMapper _mapper;
+        private readonly ISubCategoryRepo _subCategoryRepo;
 
-        public SubCategoryController(AsianMarketplaceDbContext marketplaceDbContext, IMapper mapper)
+        public SubCategoryController(IMapper mapper, ISubCategoryRepo repo)
         {
-            _marketplaceDbContext = marketplaceDbContext;
             _mapper = mapper;
+            _subCategoryRepo = repo;
         }
 
         [HttpPost]
@@ -28,10 +29,7 @@ namespace AsianMarketplace_WebAPI.Controllers
                 var newSubCategory = _mapper.Map<SubCategory>(subCategoryDTO);
 
                 // Add the new subcategory to the context
-                _marketplaceDbContext.SubCategories.Add(newSubCategory);
-
-                // Save changes to the database
-                await _marketplaceDbContext.SaveChangesAsync();
+                await _subCategoryRepo.CreateSubCategory(newSubCategory);
 
                 // Return that subcategory's details (including name and category name)
                 return
@@ -56,9 +54,8 @@ namespace AsianMarketplace_WebAPI.Controllers
             try
             {
                 // Gather subcategories into a list
-                var subCategories = await _marketplaceDbContext.SubCategories
-                .Include(s => s.Items)
-                .ToListAsync();
+                var subCategories = await _subCategoryRepo.GetSubCategories();
+                
                 if(subCategories == null)
                 {
                     return NotFound();
@@ -78,9 +75,7 @@ namespace AsianMarketplace_WebAPI.Controllers
         public async Task<ActionResult<CategoryDTO>> GetSubCategory(string name)
         {
             // Fetch the existing subcategory from the database
-            var subCategory = await _marketplaceDbContext.SubCategories
-                .Include(i => i.Items)
-                .FirstOrDefaultAsync(sc => sc.Name == name);
+            var subCategory = await _subCategoryRepo.GetSubCategory(name);
 
             if (subCategory == null)
             {
@@ -103,22 +98,15 @@ namespace AsianMarketplace_WebAPI.Controllers
         [HttpPut("{name}")]
         public async Task<IActionResult> UpdateSubCategory(string name, [FromBody] SubCategoryDTO subCategoryDTO)
         {
-            // Fetch the existing category from the database
-            var subCategory = await _marketplaceDbContext.SubCategories.FindAsync(name);
-            if (subCategory == null)
-            {
-                return NotFound();
-            }
-
             try
             {
-                // The name and category name will be updated
-                subCategory.Name = name;
-                subCategory.Category.Name = subCategoryDTO.CategoryName;
-
-                // Save changes to the database
-                await _marketplaceDbContext.SaveChangesAsync();
-
+                // Fetch the existing category from the database
+                var subCategory = await _subCategoryRepo.UpdateSubCategory(name, subCategoryDTO);
+                if (subCategory == null)
+                {
+                    return NotFound();
+                }
+                
                 // Return a response
                 return NoContent();
             }
@@ -132,20 +120,15 @@ namespace AsianMarketplace_WebAPI.Controllers
         [HttpDelete("{name}")]
         public async Task<IActionResult> DeleteSubCategory(string name)
         {
-            // Fetch the existing subcategory from the database
-            var subCategory = await _marketplaceDbContext.SubCategories.FindAsync(name);
-            if (subCategory == null)
-            {
-                return NotFound();
-            }
             try
             {
-                // Remove that subcategory from the database
-                _marketplaceDbContext.SubCategories.Remove(subCategory);
+                // Fetch the existing subcategory from the database
+                var subCategory = await _subCategoryRepo.DeleteSubCategory(name);
 
-                // Save changes to the database
-                await _marketplaceDbContext.SaveChangesAsync();
-
+                if (subCategory == null)
+                {
+                    return NotFound();
+                }
                 return NoContent();
             }
             catch (Exception ex)

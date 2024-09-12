@@ -142,7 +142,7 @@ namespace AsianMarketplace_WebAPI.Controllers
 
                 // Update the context with the new user information
                 var newUser = await _shopperRepo.UpdateShopper(username, shopperDTO);
-                //_marketplaceDbContext.Shoppers.Update(user);
+                
                 // Return a response
                 return NoContent();
             }

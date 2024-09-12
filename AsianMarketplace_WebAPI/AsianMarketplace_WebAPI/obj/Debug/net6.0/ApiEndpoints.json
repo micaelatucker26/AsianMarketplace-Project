@@ -47,27 +47,6 @@
   },
   {
     "ContainingType": "AsianMarketplace_WebAPI.Controllers.CartItemController",
-    "Method": "UpdateCartItem",
-    "RelativePath": "api/CartItem/{cartItemId}",
-    "HttpMethod": "PUT",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "cartItemId",
-        "Type": "System.Guid",
-        "IsRequired": true
-      },
-      {
-        "Name": "cartItemDTO",
-        "Type": "AsianMarketplace_WebAPI.DTOs.CartItemDTO",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "AsianMarketplace_WebAPI.Controllers.CartItemController",
     "Method": "DeleteCartItem",
     "RelativePath": "api/CartItem/{cartItemId}",
     "HttpMethod": "DELETE",
@@ -85,7 +64,7 @@
   {
     "ContainingType": "AsianMarketplace_WebAPI.Controllers.CartItemController",
     "Method": "CreateCartItem",
-    "RelativePath": "api/CartItem/{itemId}/{username}",
+    "RelativePath": "api/CartItem/{itemId}/{userId}",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
@@ -96,13 +75,39 @@
         "IsRequired": true
       },
       {
-        "Name": "username",
-        "Type": "System.String",
+        "Name": "userId",
+        "Type": "System.Guid",
         "IsRequired": true
       },
       {
         "Name": "cartItemDTO",
         "Type": "AsianMarketplace_WebAPI.DTOs.CartItemDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "AsianMarketplace_WebAPI.Controllers.CartItemController",
+    "Method": "UpdateCartItem",
+    "RelativePath": "api/CartItem/{itemId}/{userId}/{adjustment}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "itemId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      },
+      {
+        "Name": "userId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      },
+      {
+        "Name": "adjustment",
+        "Type": "System.Int32",
         "IsRequired": true
       }
     ],
@@ -308,22 +313,6 @@
   },
   {
     "ContainingType": "AsianMarketplace_WebAPI.Controllers.OrderController",
-    "Method": "CreateOrder",
-    "RelativePath": "api/Order",
-    "HttpMethod": "POST",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "orderDTO",
-        "Type": "AsianMarketplace_WebAPI.DTOs.OrderDTO",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "AsianMarketplace_WebAPI.Controllers.OrderController",
     "Method": "GetOrders",
     "RelativePath": "api/Order",
     "HttpMethod": "GET",
@@ -400,6 +389,27 @@
       {
         "Name": "orderId",
         "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "AsianMarketplace_WebAPI.Controllers.OrderController",
+    "Method": "CreateOrder",
+    "RelativePath": "api/Order/{userId}",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "userId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      },
+      {
+        "Name": "orderDTO",
+        "Type": "AsianMarketplace_WebAPI.DTOs.OrderDTO",
         "IsRequired": true
       }
     ],

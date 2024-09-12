@@ -8,10 +8,14 @@ namespace AsianMarketplace_WebAPI.Repository
     public class CategoryRepository : ICategoryRepo
     {
         private readonly AsianMarketplaceDbContext _marketplaceDbContext;
-
         public CategoryRepository(AsianMarketplaceDbContext context)
         {
             _marketplaceDbContext = context;
+        }
+
+        public async Task<bool> CategoryExists(Guid categoryId)
+        {
+            return await _marketplaceDbContext.Categories.AnyAsync(c => c.CategoryId == categoryId);
         }
         public async Task<Category> CreateCategory(Category category)
         {
