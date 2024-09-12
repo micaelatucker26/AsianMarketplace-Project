@@ -18,7 +18,6 @@ var config = new MapperConfiguration(cfg =>
         cfg.CreateMap<Category, CategoryDTO>().ReverseMap();
         cfg.CreateMap<Item, ItemDTO>().ReverseMap();
         cfg.CreateMap<Order, OrderDTO>().ReverseMap();
-        cfg.CreateMap<Order, OrderResponseDTO>().ReverseMap();
         cfg.CreateMap<OrderItem, OrderItemDTO>().ReverseMap();
         cfg.CreateMap<Shopper, ShopperDTO>().ReverseMap();
         cfg.CreateMap<ShoppingList, ShoppingListDTO>().ReverseMap();

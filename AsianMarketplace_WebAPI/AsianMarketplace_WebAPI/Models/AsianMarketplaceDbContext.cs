@@ -41,6 +41,9 @@ namespace AsianMarketplace_WebAPI.Models
             {
                 entity.ToTable("CartItem");
 
+                entity.HasIndex(e => new { e.ItemId, e.UserId }, "UQ_CartItem_ItemID_UserID")
+                    .IsUnique();
+
                 entity.Property(e => e.CartItemId)
                     .HasColumnName("CartItemID")
                     .HasDefaultValueSql("(newid())");
@@ -63,6 +66,9 @@ namespace AsianMarketplace_WebAPI.Models
             modelBuilder.Entity<Category>(entity =>
             {
                 entity.ToTable("Category");
+
+                entity.HasIndex(e => e.Name, "UQ_Name")
+                    .IsUnique();
 
                 entity.Property(e => e.CategoryId)
                     .HasColumnName("CategoryID")

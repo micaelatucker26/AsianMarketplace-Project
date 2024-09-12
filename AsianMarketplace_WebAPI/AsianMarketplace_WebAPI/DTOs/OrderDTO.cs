@@ -9,5 +9,6 @@ namespace AsianMarketplace_WebAPI.DTOs
 
         [JsonConverter(typeof(IsoDateTimeConverter))]
         public DateTime OrderDate { get; set; }
+        public List<OrderItemDTO> OrderItems { get; set; }
     }
 }

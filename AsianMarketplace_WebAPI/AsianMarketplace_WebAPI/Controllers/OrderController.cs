@@ -31,19 +31,19 @@ namespace AsianMarketplace_WebAPI.Controllers
                 // Map the DTO to the entity
                 var orderDetails = _mapper.Map<Order>(orderDTO);
 
-                var order = new Order
-                {
-                    UserId = userId,
-                    OrderDate = orderDetails.OrderDate
-                };
+                orderDetails.UserId = userId;
+                orderDetails.OrderDate = DateTime.UtcNow;
 
                 // Add the new order to the context
-                await _orderRepo.CreateOrder(order);
+                await _orderRepo.CreateOrder(orderDetails);
+
+                // After saving the order, map it back to DTO to return the created order with generated OrderId
+                var createdOrderDTO = _mapper.Map<OrderDTO>(orderDetails);
 
                 // Return that order's details (including orderId, orderdate, and username)
                 return
                     CreatedAtAction(nameof(GetOrder),
-                    new { orderId = order.OrderId }, orderDTO);
+                    new { orderId = createdOrderDTO.OrderId }, createdOrderDTO);
             }
             catch (DbUpdateException ex)
             {
@@ -58,7 +58,7 @@ namespace AsianMarketplace_WebAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<OrderResponseDTO>>> GetOrders()
+        public async Task<ActionResult<IEnumerable<OrderDTO>>> GetOrders()
         {
             try
             {
@@ -69,7 +69,7 @@ namespace AsianMarketplace_WebAPI.Controllers
                     return NotFound();
                 }
                 // Map the list of orders to the DTO
-                var orderDTOs = _mapper.Map<List<OrderResponseDTO>>(orders);
+                var orderDTOs = _mapper.Map<List<OrderDTO>>(orders);
                 return Ok(orderDTOs);
             }
             catch (Exception ex)
@@ -110,7 +110,7 @@ namespace AsianMarketplace_WebAPI.Controllers
                 var order =  await _orderRepo.UpdateOrder(orderId, orderDTO);
                 if (order == null)
                 {
-                    return NotFound();
+                    return NotFound(new {Message = $"Order with ID {orderId} not found." });
                 }
 
                 // Return a response

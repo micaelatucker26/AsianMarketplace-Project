@@ -7,8 +7,10 @@ namespace AsianMarketplace_WebAPI.Interfaces
     {
         Task<List<CartItem>> GetCartItems();
         Task<CartItem> GetCartItem(Guid cartItemId);
-        Task<CartItem> CreateCartItem(CartItem item);
-        Task<CartItem> UpdateCartItem(Guid cartItemId, CartItemDTO cartItemDTO);
-        Task<CartItem> DeleteCartItem(Guid cartItemId);
+        Task<CartItem> CreateCartItem(CartItem cartItem);
+        Task<CartItem> UpdateCartItem(Guid itemId, Guid userId, CartItem cartItem);
+        Task<CartItem> RemoveCartItemFromCart(CartItem cartItem);
+        Task<CartItem> DeleteRecord(Guid cartItemId);
+        Task<CartItem> GetCartItemByItemAndUser(Guid itemId, Guid userId);
     }
 }
