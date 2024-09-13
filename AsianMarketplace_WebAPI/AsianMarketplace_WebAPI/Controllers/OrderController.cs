@@ -1,5 +1,4 @@
 ﻿using AsianMarketplace_WebAPI.DTOs;
-using AsianMarketplace_WebAPI.DTOs.Responses;
 using AsianMarketplace_WebAPI.Interfaces;
 using AsianMarketplace_WebAPI.Models;
 using AutoMapper;
@@ -23,7 +22,7 @@ namespace AsianMarketplace_WebAPI.Controllers
             _orderItemRepo = orderItemRepo;
         }
 
-        [HttpPost("{userId}")]
+        [HttpPost("{userId:guid}")]
         public async Task<IActionResult> CreateOrder(Guid userId, [FromBody] OrderDTO orderDTO)
         {
             try
@@ -79,7 +78,7 @@ namespace AsianMarketplace_WebAPI.Controllers
             }
         }
 
-        [HttpGet("{orderId}")]
+        [HttpGet("{orderId:guid}")]
         public async Task<ActionResult<OrderDTO>> GetOrder(Guid orderId)
         {
             // Fetch the existing order from the database
@@ -101,7 +100,7 @@ namespace AsianMarketplace_WebAPI.Controllers
             }
         }
 
-        [HttpPut("{orderId}")]
+        [HttpPut("{orderId:guid}")]
         public async Task<IActionResult> UpdateOrder( Guid orderId, [FromBody] OrderDTO orderDTO)
         {
             try
@@ -123,7 +122,7 @@ namespace AsianMarketplace_WebAPI.Controllers
             }
         }
 
-        [HttpDelete("{orderId}")]
+        [HttpDelete("{orderId:guid}")]
         public async Task<IActionResult> DeleteOrder(Guid orderId)
         {
             try

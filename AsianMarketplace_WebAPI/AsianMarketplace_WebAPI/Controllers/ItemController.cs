@@ -84,7 +84,7 @@ namespace AsianMarketplace_WebAPI.Controllers
             }
         }
 
-        [HttpGet("{itemId}")]
+        [HttpGet("{itemId:guid}")]
         public async Task<ActionResult<ItemDTO>> GetItem(Guid itemId)
         {
             // Fetch the existing item from the database
@@ -106,7 +106,7 @@ namespace AsianMarketplace_WebAPI.Controllers
             }
         }
 
-        [HttpPut("{itemId}")]
+        [HttpPut("{itemId:guid}")]
         public async Task<IActionResult> UpdateItem( Guid itemId, [FromBody] ItemDTO itemDTO)
         {
             try
@@ -140,7 +140,7 @@ namespace AsianMarketplace_WebAPI.Controllers
             }
         }
 
-        [HttpDelete("{itemId}")]
+        [HttpDelete("{itemId:guid}")]
         public async Task<IActionResult> DeleteItem(Guid itemId)
         {
             try

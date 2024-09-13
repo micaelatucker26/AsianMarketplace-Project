@@ -1,5 +1,4 @@
 using AsianMarketplace_WebAPI.DTOs;
-using AsianMarketplace_WebAPI.DTOs.Responses;
 using AsianMarketplace_WebAPI.Interfaces;
 using AsianMarketplace_WebAPI.Models;
 using AsianMarketplace_WebAPI.Repository;
@@ -14,7 +13,6 @@ var builder = WebApplication.CreateBuilder(args);
 var config = new MapperConfiguration(cfg => 
     { 
         cfg.CreateMap<CartItem, CartItemDTO>().ReverseMap();
-        cfg.CreateMap<CartItem, CartItemResponseDTO>().ReverseMap();
         cfg.CreateMap<Category, CategoryDTO>().ReverseMap();
         cfg.CreateMap<Item, ItemDTO>().ReverseMap();
         cfg.CreateMap<Order, OrderDTO>().ReverseMap();
