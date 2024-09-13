@@ -25,6 +25,9 @@ namespace AsianMarketplace_WebAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateShopper([FromBody] ShopperDTO shopperDTO)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             try
             {
                 // Create a new Identity User that will identify the user whose password is hashed
@@ -76,6 +79,9 @@ namespace AsianMarketplace_WebAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ShopperDTO>>> GetShoppers()
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             try
             {
                 // Gather shoppers into a list
@@ -98,6 +104,9 @@ namespace AsianMarketplace_WebAPI.Controllers
         [HttpGet("{username}")]
         public async Task<ActionResult<ShopperDTO>> GetShopper(string username)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             // Fetch the existing shopper from the database
             var shopper = await _shopperRepo.GetShopper(username);
             if (shopper == null)
@@ -120,6 +129,9 @@ namespace AsianMarketplace_WebAPI.Controllers
         [HttpPut("{username}")]
         public async Task<IActionResult> UpdateShopper(string username, [FromBody] ShopperDTO shopperDTO)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             try
             {
                 // Fetch the existing user from the database
@@ -156,6 +168,9 @@ namespace AsianMarketplace_WebAPI.Controllers
         [HttpDelete("{username}")]
         public async Task<IActionResult> DeleteShopper(string username)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             try
             {
                 // Try to delete the shopper from the database

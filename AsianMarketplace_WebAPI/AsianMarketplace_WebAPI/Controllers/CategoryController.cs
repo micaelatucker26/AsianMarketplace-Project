@@ -23,6 +23,9 @@ namespace AsianMarketplace_WebAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateCategory([FromBody] CategoryDTO categoryDTO)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             try
             {
                 // Map the DTO to the entity
@@ -51,6 +54,9 @@ namespace AsianMarketplace_WebAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<CategoryDTO>>> GetCategories()
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             try
             {
                 // Gather categories into a list
@@ -73,6 +79,9 @@ namespace AsianMarketplace_WebAPI.Controllers
         [HttpGet("{name}")]
         public async Task<ActionResult<CategoryDTO>> GetCategory(string name)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             // Fetch the existing category from the database
             var category = await _categoryRepo.GetCategory(name);
             if (category == null)
@@ -96,6 +105,9 @@ namespace AsianMarketplace_WebAPI.Controllers
         [HttpPut("{name}")]
         public async Task<IActionResult> UpdateCategory(string name, [FromBody] CategoryDTO categoryDTO)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             try
             {
                 //Fetch the existing category from the database
@@ -117,6 +129,9 @@ namespace AsianMarketplace_WebAPI.Controllers
         [HttpDelete("{name}")]
         public async Task<IActionResult> DeleteCategory(string name)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             try
             {
                 // Fetch the existing category from the database
