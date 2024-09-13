@@ -25,6 +25,9 @@ namespace AsianMarketplace_WebAPI.Controllers
         [HttpPost("{userId:guid}")]
         public async Task<IActionResult> CreateOrder(Guid userId, [FromBody] OrderDTO orderDTO)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             try
             {
                 // Map the DTO to the entity
@@ -59,6 +62,9 @@ namespace AsianMarketplace_WebAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<OrderDTO>>> GetOrders()
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             try
             {
                 // Gather orders into a list
@@ -81,6 +87,9 @@ namespace AsianMarketplace_WebAPI.Controllers
         [HttpGet("{orderId:guid}")]
         public async Task<ActionResult<OrderDTO>> GetOrder(Guid orderId)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             // Fetch the existing order from the database
             var order = await _orderRepo.GetOrder(orderId);
             if (order == null)
@@ -103,6 +112,9 @@ namespace AsianMarketplace_WebAPI.Controllers
         [HttpPut("{orderId:guid}")]
         public async Task<IActionResult> UpdateOrder( Guid orderId, [FromBody] OrderDTO orderDTO)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             try
             {
                 // Fetch the existing order from the database
@@ -125,6 +137,9 @@ namespace AsianMarketplace_WebAPI.Controllers
         [HttpDelete("{orderId:guid}")]
         public async Task<IActionResult> DeleteOrder(Guid orderId)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             try
             {
                 // Fetch the existing order from the database

@@ -23,6 +23,9 @@ namespace AsianMarketplace_WebAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateSubCategory([FromBody] SubCategoryDTO subCategoryDTO)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             try
             {
                 // Map the DTO to the entity
@@ -51,6 +54,9 @@ namespace AsianMarketplace_WebAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<SubCategoryDTO>>> GetSubCategories()
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             try
             {
                 // Gather subcategories into a list
@@ -74,6 +80,9 @@ namespace AsianMarketplace_WebAPI.Controllers
         [HttpGet("{name}")]
         public async Task<ActionResult<CategoryDTO>> GetSubCategory(string name)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             // Fetch the existing subcategory from the database
             var subCategory = await _subCategoryRepo.GetSubCategory(name);
 
@@ -98,6 +107,9 @@ namespace AsianMarketplace_WebAPI.Controllers
         [HttpPut("{name}")]
         public async Task<IActionResult> UpdateSubCategory(string name, [FromBody] SubCategoryDTO subCategoryDTO)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             try
             {
                 // Fetch the existing category from the database
@@ -120,6 +132,9 @@ namespace AsianMarketplace_WebAPI.Controllers
         [HttpDelete("{name}")]
         public async Task<IActionResult> DeleteSubCategory(string name)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             try
             {
                 // Fetch the existing subcategory from the database

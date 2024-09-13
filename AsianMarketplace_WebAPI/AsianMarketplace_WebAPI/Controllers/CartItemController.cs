@@ -25,6 +25,9 @@ namespace AsianMarketplace_WebAPI.Controllers
         [HttpPost("{itemId:guid}/{userId:guid}")]
         public async Task<IActionResult> CreateCartItem(Guid itemId, Guid userId, [FromBody] CartItemDTO cartItemDTO)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             var response = new CartItemDTO();
             try
             { 
@@ -62,6 +65,9 @@ namespace AsianMarketplace_WebAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<CartItemDTO>>> GetCartItems()
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             try
             {
                 // Gather cart items into a list
@@ -84,6 +90,9 @@ namespace AsianMarketplace_WebAPI.Controllers
         [HttpGet("{cartItemId:guid}")]
         public async Task<ActionResult<CartItemDTO>> GetCartItem(Guid cartItemId)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             // Fetch the existing cart item from the database
             var cartItem = await _cartItemRepo.GetCartItem(cartItemId);
 
@@ -107,6 +116,9 @@ namespace AsianMarketplace_WebAPI.Controllers
         [HttpPut("{itemId:guid}/{userId:guid}/{adjustment:int}")]
         public async Task<IActionResult> UpdateCartItem(Guid itemId, Guid userId, int adjustment)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             try
             {
                 var existingCartItem = await _cartItemRepo.GetCartItemByItemAndUser(itemId, userId);
@@ -140,6 +152,9 @@ namespace AsianMarketplace_WebAPI.Controllers
         [HttpDelete("{cartItemId:guid}")]
         public async Task<IActionResult> DeleteCartItem(Guid cartItemId)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             try
             {
                 // Fetch the existing cart item from the database

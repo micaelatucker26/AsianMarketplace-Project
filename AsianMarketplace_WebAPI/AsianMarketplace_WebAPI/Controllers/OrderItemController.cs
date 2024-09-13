@@ -23,6 +23,9 @@ namespace AsianMarketplace_WebAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateOrderItem([FromBody] OrderItemDTO orderItemDTO)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             try
             {
                 // Map the DTO to the entity
@@ -60,6 +63,9 @@ namespace AsianMarketplace_WebAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<OrderItemDTO>>> GetOrderItems()
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             try
             {
                 // Gather order items into a list
@@ -82,6 +88,9 @@ namespace AsianMarketplace_WebAPI.Controllers
         [HttpGet("{itemId:guid}/{orderId:guid}")]
         public async Task<ActionResult<OrderItemDTO>> GetOrderItem( Guid itemId, Guid orderId)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             // Fetch the existing order item from the database
             var orderItem = await _orderItemRepo.GetOrderItem(itemId, orderId);
             if (orderItem == null)
@@ -104,6 +113,9 @@ namespace AsianMarketplace_WebAPI.Controllers
         [HttpPut("{itemId:guid}/{orderId:guid}")]
         public async Task<IActionResult> UpdateOrderItem( Guid itemId, Guid orderId, [FromBody] OrderItemDTO orderItemDTO)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             try
             {
                 //Validate the orderItemDTO.....
@@ -135,6 +147,9 @@ namespace AsianMarketplace_WebAPI.Controllers
         [HttpDelete("{itemId:guid}/{orderId:guid}")]
         public async Task<IActionResult> DeleteOrderItem(Guid itemId, Guid orderId)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             try
             {
                 // Try to delete the order item from the database

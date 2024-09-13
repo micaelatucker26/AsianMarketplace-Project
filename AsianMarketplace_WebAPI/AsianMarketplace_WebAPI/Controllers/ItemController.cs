@@ -23,6 +23,9 @@ namespace AsianMarketplace_WebAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateItem([FromBody] ItemDTO itemDTO)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             try
             {
                 // Map the DTO to the entity
@@ -65,6 +68,9 @@ namespace AsianMarketplace_WebAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ItemDTO>>> GetItems()
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             try
             {
                 // Gather items into a list
@@ -87,6 +93,9 @@ namespace AsianMarketplace_WebAPI.Controllers
         [HttpGet("{itemId:guid}")]
         public async Task<ActionResult<ItemDTO>> GetItem(Guid itemId)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             // Fetch the existing item from the database
             var item = await _itemRepo.GetItem(itemId);
             if (item == null)
@@ -109,6 +118,9 @@ namespace AsianMarketplace_WebAPI.Controllers
         [HttpPut("{itemId:guid}")]
         public async Task<IActionResult> UpdateItem( Guid itemId, [FromBody] ItemDTO itemDTO)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             try
             {
                 // Validate the itemDTO.....
@@ -143,6 +155,9 @@ namespace AsianMarketplace_WebAPI.Controllers
         [HttpDelete("{itemId:guid}")]
         public async Task<IActionResult> DeleteItem(Guid itemId)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             try
             {
                 // Fetch the existing item from the database

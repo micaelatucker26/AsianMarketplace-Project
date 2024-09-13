@@ -25,6 +25,9 @@ namespace AsianMarketplace_WebAPI.Controllers
         [HttpPost("{username}")]
         public async Task<IActionResult> CreateShoppingList(string username, [FromBody] ShoppingListDTO shoppingListDTO)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             try
             {
                 //Map the DTO to the entity
@@ -58,6 +61,9 @@ namespace AsianMarketplace_WebAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ShoppingListDTO>>> GetShoppingLists()
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             try
             {
                 //Gather shopping lists into a list
@@ -81,6 +87,9 @@ namespace AsianMarketplace_WebAPI.Controllers
         [HttpGet("{title}/{username}")]
         public async Task<ActionResult<ShoppingListDTO>> GetShoppingList(string title, string username)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             var user = await _shopperRepo.GetShopper(username);
             if(user == null)
             {
@@ -109,6 +118,9 @@ namespace AsianMarketplace_WebAPI.Controllers
         [HttpPut("{title}/{username}")]
         public async Task<IActionResult> UpdateShoppingList(string title, string username, [FromBody] ShoppingListDTO shoppingListDTO)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             try
             {
                 var user = await _shopperRepo.GetShopper(username);
@@ -136,6 +148,9 @@ namespace AsianMarketplace_WebAPI.Controllers
         [HttpDelete("{title}/{username}")]
         public async Task<IActionResult> DeleteShoppingList(string title, string username)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             try
             {
                 var user = await _shopperRepo.GetShopper(username);
