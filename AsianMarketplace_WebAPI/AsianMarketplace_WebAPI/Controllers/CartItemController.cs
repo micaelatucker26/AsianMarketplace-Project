@@ -1,5 +1,4 @@
 ﻿using AsianMarketplace_WebAPI.DTOs;
-using AsianMarketplace_WebAPI.DTOs.Responses;
 using AsianMarketplace_WebAPI.Interfaces;
 using AsianMarketplace_WebAPI.Models;
 using AutoMapper;
@@ -23,10 +22,10 @@ namespace AsianMarketplace_WebAPI.Controllers
             _shopperRepo = shopperRepo;
         }
 
-        [HttpPost("{itemId}/{userId}")]
+        [HttpPost("{itemId:guid}/{userId:guid}")]
         public async Task<IActionResult> CreateCartItem(Guid itemId, Guid userId, [FromBody] CartItemDTO cartItemDTO)
         {
-            var response = new CartItemResponseDTO();
+            var response = new CartItemDTO();
             try
             { 
                 // Check if the cart item already exists for this user
@@ -36,7 +35,7 @@ namespace AsianMarketplace_WebAPI.Controllers
                     // Update the quantity of the existing cart item
                     existingCartItem.Quantity += cartItemDTO.Quantity;
                     await _cartItemRepo.UpdateCartItem(itemId, userId,existingCartItem);
-                    response = _mapper.Map<CartItemResponseDTO>(existingCartItem);
+                    response = _mapper.Map<CartItemDTO>(existingCartItem);
                     return Ok(response);
                 }
                 else
@@ -50,7 +49,7 @@ namespace AsianMarketplace_WebAPI.Controllers
                     };
 
                     await _cartItemRepo.CreateCartItem(cartItem);
-                    response = _mapper.Map<CartItemResponseDTO>(cartItem);
+                    response = _mapper.Map<CartItemDTO>(cartItem);
                     return Ok(response);
                 }
             }
@@ -61,7 +60,7 @@ namespace AsianMarketplace_WebAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<CartItemResponseDTO>>> GetCartItems()
+        public async Task<ActionResult<IEnumerable<CartItemDTO>>> GetCartItems()
         {
             try
             {
@@ -72,7 +71,7 @@ namespace AsianMarketplace_WebAPI.Controllers
                     return NotFound();
                 }
                 // Map the list of cart items to the DTO
-                var cartItemDTOs = _mapper.Map<List<CartItemResponseDTO>>(cartItems);
+                var cartItemDTOs = _mapper.Map<List<CartItemDTO>>(cartItems);
                 return Ok(cartItemDTOs);
             }
             catch(Exception ex)
@@ -82,8 +81,8 @@ namespace AsianMarketplace_WebAPI.Controllers
             }
         }
 
-        [HttpGet("{cartItemId}")]
-        public async Task<ActionResult<CartItemResponseDTO>> GetCartItem(Guid cartItemId)
+        [HttpGet("{cartItemId:guid}")]
+        public async Task<ActionResult<CartItemDTO>> GetCartItem(Guid cartItemId)
         {
             // Fetch the existing cart item from the database
             var cartItem = await _cartItemRepo.GetCartItem(cartItemId);
@@ -95,7 +94,7 @@ namespace AsianMarketplace_WebAPI.Controllers
             try
             {
                 // Map that cart item to the DTO
-                var cartItemDTO = _mapper.Map<CartItemResponseDTO>(cartItem);
+                var cartItemDTO = _mapper.Map<CartItemDTO>(cartItem);
                 return Ok(cartItemDTO);
             }
             catch (Exception ex)
@@ -105,7 +104,7 @@ namespace AsianMarketplace_WebAPI.Controllers
             }
         }
 
-        [HttpPut("{itemId}/{userId}/{adjustment}")]
+        [HttpPut("{itemId:guid}/{userId:guid}/{adjustment:int}")]
         public async Task<IActionResult> UpdateCartItem(Guid itemId, Guid userId, int adjustment)
         {
             try
@@ -138,7 +137,7 @@ namespace AsianMarketplace_WebAPI.Controllers
             }
         }
 
-        [HttpDelete("{cartItemId}")]
+        [HttpDelete("{cartItemId:guid}")]
         public async Task<IActionResult> DeleteCartItem(Guid cartItemId)
         {
             try

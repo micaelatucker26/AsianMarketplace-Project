@@ -9,7 +9,7 @@
     "Parameters": [],
     "ReturnTypes": [
       {
-        "Type": "System.Collections.Generic.IEnumerable\u00601[[AsianMarketplace_WebAPI.DTOs.Responses.CartItemResponseDTO, AsianMarketplace_WebAPI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "Type": "System.Collections.Generic.IEnumerable\u00601[[AsianMarketplace_WebAPI.DTOs.CartItemDTO, AsianMarketplace_WebAPI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -35,7 +35,7 @@
     ],
     "ReturnTypes": [
       {
-        "Type": "AsianMarketplace_WebAPI.DTOs.Responses.CartItemResponseDTO",
+        "Type": "AsianMarketplace_WebAPI.DTOs.CartItemDTO",
         "MediaTypes": [
           "text/plain",
           "application/json",
